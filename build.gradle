@@ -1,0 +1,20 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.mparticle:android-kit-plugin:+'
+    }
+}
+
+apply plugin: 'com.mparticle.kit'
+
+dependencies {
+    //TODO: Option 1: Replace with your Maven Central Dependency (preferred)
+    //compile 'com.example:example-artifact:1.2.3'
+
+    //TODO: Option 2: Include your jar in ./libs only if you're not in Maven Central
+    //TODO:           Please name the jar based on the version, ie AcmeSDK1234.jar
+    //compile fileTree(dir: 'libs', include: ['*.jar'])
+}
