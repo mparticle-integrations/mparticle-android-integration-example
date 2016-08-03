@@ -1,6 +1,6 @@
-## Example Kit Integration
+## Apptimize Kit Integration
 
-This repository contains the [Example](https://www.example.com/) integration for the [mParticle Android SDK](https://github.com/mParticle/mparticle-android-sdk).
+This repository contains the [Apptimize](https://www.apptimize.com/) integration for the [mParticle Android SDK](https://github.com/mParticle/mparticle-android-sdk).
 
 ### Adding the integration
 
