@@ -1,47 +1,111 @@
 package com.mparticle.kits;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.apptimize.Apptimize;
+import com.apptimize.ApptimizeOptions;
 import com.mparticle.MPEvent;
 import com.mparticle.MParticle;
 import com.mparticle.commerce.CommerceEvent;
 
 import java.math.BigDecimal;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class ApptimizeKit extends KitIntegration implements KitIntegration.AttributeListener, KitIntegration.EventListener {
+public class ApptimizeKit
+        extends KitIntegration
+        implements KitIntegration.AttributeListener,
+        KitIntegration.EventListener,
+        KitIntegration.CommerceListener {
 
-    public static final String APP_KEY = "appKey";
-    public static final String ALIAS_KEY = "mparticleAlias";
-    public static final String CUSTOMER_ID_KEY = "mparticleCustomerId";
-    public static final String VIEWED_EVENT_FORMAT = "Viewed %s Screen";
+    private static final String APP_MP_KEY = "appKey";
+    private static final String UPDATE_METDATA_TIMEOUT_MP_KEY = "metadataTimeout";
+    private static final String DEVICE_NAME_MP_KEY = "deviceName";
+    private static final String DEVELOPER_MODE_DISABLED_MP_KEY = "developerModeDisabled";
+    private static final String EXPLICIT_ENABLING_REQUIRED_MP_KEY = "explicitEnablingRequired";
+    private static final String MULTIPROCESS_MODE_ENABLED_MP_KEY = "multiprocessModeEnabled";
+    private static final String LOG_LEVEL_MP_KEY = "logLevel";
+    private static final String LOGOUT_TAG = "logout";
+    private static final String LTV_TAG = "ltv";
+    private static final String VIEWED_EVENT_FORMAT = "screenView %s";
+
+    private List<ReportingMessage> toMessageList(final ReportingMessage message) {
+        return Collections.singletonList(message);
+    }
+
+    private ReportingMessage createReportingMessage(final String messageType) {
+        return new ReportingMessage(
+                this,
+                messageType,
+                System.currentTimeMillis(),
+                null
+        );
+    }
 
     @Override
     protected List<ReportingMessage> onKitCreate(Map<String, String> settings, Context context) {
-        String appKey = getSettings().get(APP_KEY);
-        Apptimize.setup(getContext(), appKey);
+        final String appKey = getSettings().get(APP_MP_KEY);
+        if (TextUtils.isEmpty(appKey)) {
+            throw new IllegalArgumentException(APP_MP_KEY);
+        }
+        Apptimize.setup(getContext(), appKey, buildApptimizeOptions(settings));
         return null;
+    }
+
+    private ApptimizeOptions buildApptimizeOptions(final Map<String, String> settings) {
+        ApptimizeOptions o = new ApptimizeOptions();
+        o.setThirdPartyEventImportingEnabled(false);
+        configureApptimizeUpdateMetaDataTimeout(o, settings);
+        configureApptimizeDeviceName(o, settings);
+        configureApptimizeDeveloperModeDisabled(o, settings);
+        configureApptimizeExplicitEnablingRequired(o, settings);
+        configureApptimizeMultiprocessModeEnabled(o, settings);
+        configureApptimizeLogLevel(o, settings);
+        return o;
+    }
+
+    private void configureApptimizeUpdateMetaDataTimeout(final ApptimizeOptions o, final Map<String, String> settings) {
+        try {
+            final Long l = Long.parseLong(settings.get(UPDATE_METDATA_TIMEOUT_MP_KEY));
+            o.setUpdateMetadataTimeout(l);
+        } catch (NumberFormatException nfe) {
+        }
+    }
+
+    private void configureApptimizeDeviceName(final ApptimizeOptions o, final Map<String, String> settings) {
+        final String v = settings.get(DEVICE_NAME_MP_KEY);
+        o.setDeviceName(v);
+    }
+
+    private void configureApptimizeDeveloperModeDisabled(final ApptimizeOptions o, final Map<String, String> settings) {
+        final Boolean b = Boolean.parseBoolean(settings.get(DEVELOPER_MODE_DISABLED_MP_KEY));
+        o.setDeveloperModeDisabled(b.booleanValue());
+    }
+
+    private void configureApptimizeExplicitEnablingRequired(final ApptimizeOptions o, final Map<String, String> settings) {
+        final Boolean b = Boolean.parseBoolean(settings.get(EXPLICIT_ENABLING_REQUIRED_MP_KEY));
+        o.setExplicitEnablingRequired(b.booleanValue());
+    }
+
+    private void configureApptimizeMultiprocessModeEnabled(final ApptimizeOptions o, final Map<String, String> settings) {
+        final Boolean b = Boolean.parseBoolean(settings.get(MULTIPROCESS_MODE_ENABLED_MP_KEY));
+        o.setMultiprocessMode(b.booleanValue());
+    }
+
+    private void configureApptimizeLogLevel(final ApptimizeOptions o, final Map<String, String> settings) {
+        try {
+            final ApptimizeOptions.LogLevel l = ApptimizeOptions.LogLevel.valueOf(settings.get(LOG_LEVEL_MP_KEY));
+            o.setLogLevel(l);
+        } catch (IllegalArgumentException iae) {
+        }
     }
 
     @Override
     public String getName() {
         return "Apptimize";
     }
-
-    @Override
-    public List<ReportingMessage> setOptOut(boolean optedOut) {
-        Apptimize.disable();
-        List<ReportingMessage> messageList = new LinkedList<>();
-        messageList.add(
-                new ReportingMessage(this, ReportingMessage.MessageType.OPT_OUT, System.currentTimeMillis(), null)
-                        .setOptOut(optedOut)
-        );
-        return messageList;
-    }
-
 
     @Override
     public void setUserAttribute(String key, String value) {
@@ -60,7 +124,7 @@ public class ApptimizeKit extends KitIntegration implements KitIntegration.Attri
 
     @Override
     public void setAllUserAttributes(Map<String, String> attributes, Map<String, List<String>> attributeLists) {
-        for (Map.Entry<String, String> entry : attributes.entrySet()){
+        for (Map.Entry<String, String> entry : attributes.entrySet()) {
             setUserAttribute(entry.getKey(), entry.getValue());
         }
         // attributeLists are not supported
@@ -73,26 +137,24 @@ public class ApptimizeKit extends KitIntegration implements KitIntegration.Attri
 
     @Override
     public void setUserIdentity(MParticle.IdentityType identityType, String id) {
-        if (identityType.equals(MParticle.IdentityType.Alias)) {
-            Apptimize.setUserAttribute(ALIAS_KEY, id);
-        } else if (identityType.equals(MParticle.IdentityType.CustomerId)) {
-            Apptimize.setUserAttribute(CUSTOMER_ID_KEY, id);
+        switch (identityType) {
+            case Alias:
+            case CustomerId: {
+                Apptimize.setPilotTargetingId(id);
+                break;
+            }
         }
     }
 
     @Override
     public void removeUserIdentity(MParticle.IdentityType identityType) {
-        if (identityType.equals(MParticle.IdentityType.Alias)) {
-            Apptimize.clearUserAttribute(ALIAS_KEY);
-        } else if (identityType.equals(MParticle.IdentityType.CustomerId)) {
-            Apptimize.clearUserAttribute(CUSTOMER_ID_KEY);
-        }
+        setUserIdentity(identityType, null);
     }
 
     @Override
     public List<ReportingMessage> logout() {
-        // Apptimize does not consider the user to have changed when they logout
-        return null;
+        Apptimize.track(LOGOUT_TAG);
+        return toMessageList(ReportingMessage.logoutMessage(this));
     }
 
     @Override
@@ -116,20 +178,36 @@ public class ApptimizeKit extends KitIntegration implements KitIntegration.Attri
     @Override
     public List<ReportingMessage> logEvent(MPEvent mpEvent) {
         Apptimize.track(mpEvent.getEventName());
-        List<ReportingMessage> messageList = new LinkedList<>();
-        messageList.add(ReportingMessage.fromEvent(this, mpEvent));
-        return messageList;
+        return toMessageList(ReportingMessage.fromEvent(this, mpEvent));
     }
 
     @Override
     public List<ReportingMessage> logScreen(String screenName, Map<String, String> eventAttributes) {
-        String event = String.format(VIEWED_EVENT_FORMAT, screenName);
+        final String event = String.format(VIEWED_EVENT_FORMAT, screenName);
         Apptimize.track(event);
-        List<ReportingMessage> messageList = new LinkedList<>();
-        messageList.add(
-                new ReportingMessage(this, ReportingMessage.MessageType.SCREEN_VIEW, System.currentTimeMillis(), eventAttributes)
-                        .setScreenName(screenName)
-        );
-        return messageList;
+        return toMessageList(createReportingMessage(ReportingMessage.MessageType.SCREEN_VIEW).setScreenName(screenName));
+    }
+
+    @Override
+    public List<ReportingMessage> logLtvIncrease(BigDecimal valueIncreased, BigDecimal valueTotal, String eventName, Map<String, String> contextInfo) {
+        // match the iOS style, where only the delta is sent rather than an absolute final value.
+        Apptimize.track(LTV_TAG, valueIncreased.doubleValue());
+        return toMessageList(createReportingMessage(ReportingMessage.MessageType.COMMERCE_EVENT));
+    }
+
+    @Override
+    public List<ReportingMessage> logEvent(CommerceEvent event) {
+        // not supported.
+        return null;
+    }
+
+    @Override
+    public List<ReportingMessage> setOptOut(boolean optedOut) {
+        List<ReportingMessage> ret = null;
+        if (optedOut) {
+            Apptimize.disable();
+            ret = toMessageList(createReportingMessage(ReportingMessage.MessageType.OPT_OUT).setOptOut(optedOut));
+        }
+        return ret;
     }
 }
