@@ -114,6 +114,9 @@ public class ApptimizeKit
         Apptimize.setUserAttribute(key, value);
     }
 
+    /**
+     * Not supported by the Apptimize kit.
+     */
     @Override
     public void setUserAttributeList(String key, List<String> list) {
         // not supported
@@ -124,12 +127,14 @@ public class ApptimizeKit
         return false;
     }
 
+    /**
+     * @param attributeLists is ignored by the Apptimize kit.
+     */
     @Override
     public void setAllUserAttributes(Map<String, String> attributes, Map<String, List<String>> attributeLists) {
         for (Map.Entry<String, String> entry : attributes.entrySet()) {
             setUserAttribute(entry.getKey(), entry.getValue());
         }
-        // attributeLists are not supported
     }
 
     @Override
@@ -137,6 +142,9 @@ public class ApptimizeKit
         Apptimize.clearUserAttribute(key);
     }
 
+    /**
+     * @param identityType only Alias and CustomerId are suppoted by the Apptimize kit.
+     */
     @Override
     public void setUserIdentity(MParticle.IdentityType identityType, String id) {
         switch (identityType) {
@@ -159,21 +167,27 @@ public class ApptimizeKit
         return toMessageList(ReportingMessage.logoutMessage(this));
     }
 
+    /**
+     * Not supported by the Apptimize kit.
+     */
     @Override
     public List<ReportingMessage> leaveBreadcrumb(String s) {
-        // not supported
         return null;
     }
 
+    /**
+     * Not supported by the Apptimize kit.
+     */
     @Override
     public List<ReportingMessage> logError(String s, Map<String, String> map) {
-        // not supported
         return null;
     }
 
+    /**
+     * Not supported by the Apptimize kit.
+     */
     @Override
     public List<ReportingMessage> logException(Exception e, Map<String, String> map, String s) {
-        // not supported
         return null;
     }
 
@@ -183,6 +197,9 @@ public class ApptimizeKit
         return toMessageList(ReportingMessage.fromEvent(this, mpEvent));
     }
 
+    /**
+     * @param eventAttributes is ignored by the Apptimize kit.
+     */
     @Override
     public List<ReportingMessage> logScreen(String screenName, Map<String, String> eventAttributes) {
         final String event = String.format(VIEWED_EVENT_FORMAT, screenName);
@@ -190,6 +207,10 @@ public class ApptimizeKit
         return toMessageList(createReportingMessage(ReportingMessage.MessageType.SCREEN_VIEW).setScreenName(screenName));
     }
 
+    /**
+     * @param valueTotal is iqgnored by the Apptimize kit.
+     * @param contextInfo is ignored by the Apptimize kit.
+     */
     @Override
     public List<ReportingMessage> logLtvIncrease(BigDecimal valueIncreased, BigDecimal valueTotal, String eventName, Map<String, String> contextInfo) {
         // match the iOS style, where only the delta is sent rather than an absolute final value.
@@ -197,12 +218,18 @@ public class ApptimizeKit
         return toMessageList(createReportingMessage(ReportingMessage.MessageType.COMMERCE_EVENT));
     }
 
+    /**
+     * Not supported by the Apptimize kit.
+     */
     @Override
     public List<ReportingMessage> logEvent(CommerceEvent event) {
-        // not supported.
         return null;
     }
 
+    /**
+     * After opting out, it is not possible to opt back in via the Apptimize kit.
+     * @param optedOut only a value of 'true' supported by the Apptimize kit.
+     */
     @Override
     public List<ReportingMessage> setOptOut(boolean optedOut) {
         List<ReportingMessage> ret = null;
