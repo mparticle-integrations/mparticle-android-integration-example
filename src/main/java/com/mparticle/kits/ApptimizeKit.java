@@ -100,6 +100,8 @@ public class ApptimizeKit
             o.setLogLevel(l);
         } catch (IllegalArgumentException iae) {
         }
+        catch (NullPointerException npe) {
+        }
     }
 
     @Override
