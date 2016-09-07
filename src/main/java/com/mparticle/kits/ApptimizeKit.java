@@ -1,6 +1,8 @@
 package com.mparticle.kits;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 
 import com.apptimize.Apptimize;
@@ -50,8 +52,25 @@ public class ApptimizeKit
         if (TextUtils.isEmpty(appKey)) {
             throw new IllegalArgumentException(APP_MP_KEY);
         }
-        Apptimize.setup(getContext(), appKey, buildApptimizeOptions(settings));
+        final ApptimizeOptions options = buildApptimizeOptions(settings);
+        createApptimizeOnMainThread( appKey, options, context );
         return null;
+    }
+
+    private void createApptimizeOnMainThread( final String appKey, final ApptimizeOptions options, final Context context ) {
+        final boolean isMainThread = Looper.myLooper() == Looper.getMainLooper();
+        if( isMainThread ) {
+            Apptimize.setup( context, appKey, options );
+        } else {
+            new Handler( context.getMainLooper() ).post(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        Apptimize.setup( context, appKey, options );
+                    }
+                }
+            );
+        }
     }
 
     private ApptimizeOptions buildApptimizeOptions(final Map<String, String> settings) {
