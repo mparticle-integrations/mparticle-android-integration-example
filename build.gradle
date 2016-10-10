@@ -1,18 +1,69 @@
 buildscript {
     repositories {
-        mavenLocal()
+        //mavenLocal()
         mavenCentral()
     }
+
     dependencies {
-        classpath 'com.mparticle:android-kit-plugin:+'
+        classpath 'com.mparticle:android-kit-plugin:4.8.3'
     }
 }
 
 apply plugin: 'com.mparticle.kit'
 
+
+version '1.0.0'
+
+//android {
+//    compileSdkVersion 23
+//    buildToolsVersion "23.0.1"
+//
+//    defaultConfig {
+//        minSdkVersion 9
+//        targetSdkVersion 23
+//        versionCode 1
+//        versionName version
+//    }
+//    buildTypes {
+//        release {
+//            minifyEnabled false
+//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+//        }
+//    }
+//    compileOptions {
+//        sourceCompatibility JavaVersion.VERSION_1_6
+//        targetCompatibility JavaVersion.VERSION_1_6
+//    }
+//}
+
+
+group 'com.stepleaderdigital.reveal'
+ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+task deleteOldJar(type: Delete) {
+    delete 'release/release*.jar'
+}
+
+task exportJar(type: Copy) {
+    from "build/intermediates/bundles/release/"
+    into 'release'
+    include('classes.jar')
+    rename { String fileName ->
+        fileName.replace("classes.jar", "mParticle-Reveal-" + version + ".jar" )
+    }
+}
+
+exportJar.dependsOn(deleteOldJar, build)
+
 dependencies {
     //TODO: Option 1: Replace with your Maven Central Dependency (preferred)
-    //compile 'com.example:example-artifact:1.2.3'
+    compile 'com.mparticle:android-kit-base:4.8.3'
+    compile 'com.stepleaderdigital.reveal:reveal:+'
 
     //TODO: Option 2: Include your jar in ./libs only if you're not in Maven Central
     //TODO:           Please name the jar based on the version, ie AcmeSDK1234.jar
