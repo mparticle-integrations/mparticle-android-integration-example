@@ -2,6 +2,7 @@ package com.mparticle.kits;
 
 import android.content.Context;
 
+import com.mparticle.MParticle;
 import com.stepleaderdigital.reveal.Reveal;
 
 import java.util.List;
@@ -38,7 +39,9 @@ public class RevealMobileKit extends KitIntegration {
         String apiKey = settings.get( "apiKey" );
         String serviceTypeString = settings.get( "serviceType" );
 
-        this.revealSDK.setDebug( true );
+        if (MParticle.getInstance().getEnvironment().equals(MParticle.Environment.Development)) {
+            this.revealSDK.setDebug( true );
+        }
 
         if ( apiKey != null ) {
             Reveal.ServiceType serviceType = Reveal.ServiceType.PRODUCTION;
@@ -50,6 +53,9 @@ public class RevealMobileKit extends KitIntegration {
                     serviceType = Reveal.ServiceType.SANDBOX;
                 else if (serviceTypeString.equals("rvlservicetypesandbox")) // this provided for cmpatability with iOS environment variables
                     serviceType = Reveal.ServiceType.SANDBOX;
+            }
+            else {
+                throw new IllegalArgumentException( "No API Key provided");
             }
 
             this.revealSDK.setAPIKey(apiKey);
