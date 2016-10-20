@@ -37,26 +37,14 @@ public class RevealMobileKit extends KitIntegration {
         //Create Reveal configuration.
         this.revealSDK = Reveal.getInstance();
         String apiKey = settings.get( "apiKey" );
-        String serviceTypeString = settings.get( "serviceType" );
 
         if (MParticle.getInstance().getEnvironment().equals(MParticle.Environment.Development)) {
             this.revealSDK.setDebug( true );
         }
 
         if ( apiKey != null ) {
-            Reveal.ServiceType serviceType = Reveal.ServiceType.PRODUCTION;
-
-            if (serviceTypeString != null) {
-                serviceTypeString = serviceTypeString.toLowerCase();
-
-                if (serviceTypeString.equals("sandbox"))
-                    serviceType = Reveal.ServiceType.SANDBOX;
-                else if (serviceTypeString.equals("rvlservicetypesandbox")) // this provided for cmpatability with iOS environment variables
-                    serviceType = Reveal.ServiceType.SANDBOX;
-            }
-
             this.revealSDK.setAPIKey(apiKey);
-            this.revealSDK.setServiceType(serviceType);
+            this.revealSDK.setServiceType( Reveal.ServiceType.PRODUCTION );
         }
         else {
             throw new IllegalArgumentException( "No API Key provided");

@@ -19,7 +19,7 @@ repositories {
 dependencies {
     //TODO: Option 1: Replace with your Maven Central Dependency (preferred)
     compile 'com.mparticle:android-kit-base:4.8.3'
-    compile 'com.stepleaderdigital.reveal:reveal:+'
+    compile 'com.stepleaderdigital.reveal:reveal:1.3.5'
 
     //TODO: Option 2: Include your jar in ./libs only if you're not in Maven Central
     //TODO:           Please name the jar based on the version, ie AcmeSDK1234.jar
