@@ -54,12 +54,12 @@ public class RevealMobileKit extends KitIntegration {
                 else if (serviceTypeString.equals("rvlservicetypesandbox")) // this provided for cmpatability with iOS environment variables
                     serviceType = Reveal.ServiceType.SANDBOX;
             }
-            else {
-                throw new IllegalArgumentException( "No API Key provided");
-            }
 
             this.revealSDK.setAPIKey(apiKey);
             this.revealSDK.setServiceType(serviceType);
+        }
+        else {
+            throw new IllegalArgumentException( "No API Key provided");
         }
 
         return null;
