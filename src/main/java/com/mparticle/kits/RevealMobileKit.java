@@ -2,6 +2,9 @@ package com.mparticle.kits;
 
 import android.content.Context;
 
+import com.mparticle.MParticle;
+import com.stepleaderdigital.reveal.Reveal;
+
 import java.util.List;
 import java.util.Map;
 
@@ -25,35 +28,39 @@ import java.util.Map;
  *  - ./src/main/AndroidManifest.xml
  *  - ./consumer-proguard.pro
  */
-public class ExampleKit extends KitIntegration {
+public class RevealMobileKit extends KitIntegration {
+
+    public Reveal revealSDK = null;
 
     @Override
     protected List<ReportingMessage> onKitCreate(Map<String, String> settings, Context context) {
-        /** TODO: Initialize your SDK here
-         * This method is analogous to Application#onCreate, and will be called once per app execution.
-         *
-         * If for some reason you can't start your SDK (such as settings are not present), you *must* throw an Exception
-         *
-         * If you forward any events on startup that are analagous to any mParticle messages types, return them here
-         * as ReportingMessage objects. Otherwise, return null.
-         */
+        //Create Reveal configuration.
+        this.revealSDK = Reveal.getInstance();
+        String apiKey = settings.get( "apiKey" );
+
+        if (MParticle.getInstance().getEnvironment().equals(MParticle.Environment.Development)) {
+            this.revealSDK.setDebug( true );
+        }
+
+        if ( apiKey != null ) {
+            this.revealSDK.setAPIKey(apiKey);
+            this.revealSDK.setServiceType( Reveal.ServiceType.PRODUCTION );
+        }
+        else {
+            throw new IllegalArgumentException( "No API Key provided");
+        }
+
         return null;
     }
 
 
     @Override
     public String getName() {
-        //TODO: Replace this with your company name
-        return "Example";
+        return "RevealMobile";
     }
-
-
 
     @Override
     public List<ReportingMessage> setOptOut(boolean optedOut) {
-        //TODO: Disable or enable your SDK when a user opts out.
-        //TODO: If your SDK can not be opted out of, return null
-        ReportingMessage optOutMessage = new ReportingMessage(this, ReportingMessage.MessageType.OPT_OUT, System.currentTimeMillis(), null);
         return null;
     }
 }

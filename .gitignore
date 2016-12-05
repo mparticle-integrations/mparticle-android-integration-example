@@ -35,3 +35,4 @@ local.properties
 # Gradle
 build
 .gradle
+release
