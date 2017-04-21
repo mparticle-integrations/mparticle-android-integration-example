@@ -1,7 +1,7 @@
 buildscript {
     repositories {
         mavenLocal()
-        mavenCentral()
+        jcenter()
     }
     dependencies {
         classpath 'com.mparticle:android-kit-plugin:+'
@@ -11,6 +11,12 @@ buildscript {
 version = "4.11.4"
 
 apply plugin: 'com.mparticle.kit'
+
+android {
+    defaultConfig {
+        minSdkVersion 15
+    }
+}
 
 dependencies {
     compile 'com.iterable:iterableapi:2.1.4'

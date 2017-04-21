@@ -1,4 +1,1 @@
-<manifest package="com.mparticle.kits.iterable"
-    xmlns:tools="http://schemas.android.com/tools">
-    <uses-sdk tools:overrideLibrary="iterable.com.iterableapi"/>
- </manifest>
+<manifest package="com.mparticle.kits.iterable"/>
