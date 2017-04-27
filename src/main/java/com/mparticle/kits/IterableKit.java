@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public class IterableKit extends KitIntegration implements KitIntegration.ActivityListener {
 
-   String deeplinkUrl;
+   private String deeplinkUrl;
 
     @Override
     protected List<ReportingMessage> onKitCreate(Map<String, String> settings, Context context) {
@@ -44,7 +44,7 @@ public class IterableKit extends KitIntegration implements KitIntegration.Activi
             }
         };
 
-        IterableAPI.getAndTrackDeeplink(deeplinkUrl, clickCallback);
+        IterableApi.getAndTrackDeeplink(deeplinkUrl, clickCallback);
         deeplinkUrl = null;
     }
 

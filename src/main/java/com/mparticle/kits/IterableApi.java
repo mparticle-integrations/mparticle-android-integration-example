@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
  * Created by David Truong dt@iterable.com.
  */
 
-public class IterableAPI {
+public class IterableApi {
     private static Pattern deeplinkPattern = Pattern.compile("/a/[A-Za-z0-9]+");
 
     /**
@@ -20,7 +20,7 @@ public class IterableAPI {
         if (uri != null) {
             Matcher m = deeplinkPattern.matcher(uri);
             if (m.find( )) {
-                IterableApiRequest request = new IterableApiRequest(null, uri, null, IterableApiRequest.REDIRECT, onCallback);
+                IterableDeeplinkApiRequest request = new IterableDeeplinkApiRequest(uri, onCallback);
                 new IterableRequest().execute(request);
             } else {
                 onCallback.execute(uri);
