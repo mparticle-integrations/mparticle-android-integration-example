@@ -4,10 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 
-import com.iterable.iterableapi.IterableApi;
-import com.iterable.iterableapi.IterableHelper;
 import com.mparticle.DeepLinkResult;
-import com.mparticle.MParticle;
 
 import java.util.List;
 import java.util.Map;
@@ -39,7 +36,6 @@ public class IterableKit extends KitIntegration implements KitIntegration.Activi
 
     @Override
     public void checkForDeepLink() {
-        MParticle.getInstance().getAppStateManager().getLaunchUri();
         IterableHelper.IterableActionHandler clickCallback = new IterableHelper.IterableActionHandler(){
             @Override
             public void execute(String result) {
@@ -48,7 +44,7 @@ public class IterableKit extends KitIntegration implements KitIntegration.Activi
             }
         };
 
-        IterableApi.getAndTrackDeeplink(deeplinkUrl, clickCallback);
+        IterableAPI.getAndTrackDeeplink(deeplinkUrl, clickCallback);
         deeplinkUrl = null;
     }
 
