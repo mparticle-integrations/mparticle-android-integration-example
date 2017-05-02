@@ -30,7 +30,6 @@ public class IterableKit extends KitIntegration implements KitIntegration.Activi
 
     @Override
     public List<ReportingMessage> setOptOut(boolean optedOut) {
-        ReportingMessage optOutMessage = new ReportingMessage(this, ReportingMessage.MessageType.OPT_OUT, System.currentTimeMillis(), null);
         return null;
     }
 
@@ -39,13 +38,15 @@ public class IterableKit extends KitIntegration implements KitIntegration.Activi
         IterableHelper.IterableActionHandler clickCallback = new IterableHelper.IterableActionHandler(){
             @Override
             public void execute(String result) {
-                DeepLinkResult deepLinkResult = new DeepLinkResult().setLink(result);
+            DeepLinkResult deepLinkResult = new DeepLinkResult().setLink(result);
+            deepLinkResult.setServiceProviderId(getConfiguration().getKitId());
+            if(!KitUtils.isEmpty(result)) {
                 getKitManager().onResult(deepLinkResult);
+            }
             }
         };
 
         IterableApi.getAndTrackDeeplink(deeplinkUrl, clickCallback);
-        deeplinkUrl = null;
     }
 
     @Override

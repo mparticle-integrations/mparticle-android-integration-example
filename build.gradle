@@ -17,6 +17,3 @@ android {
         minSdkVersion 15
     }
 }
-
-dependencies {
-}

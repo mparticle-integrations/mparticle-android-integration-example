@@ -35,6 +35,7 @@ class IterableRequest extends AsyncTask<IterableDeeplinkApiRequest, Void, String
             iterableApiRequest = params[0];
         }
 
+        //retry immediately then retry with backoff
         if (retryCount > 2) {
             try {
                 Thread.sleep(RETRY_DELAY_MS * retryCount);
@@ -47,7 +48,6 @@ class IterableRequest extends AsyncTask<IterableDeeplinkApiRequest, Void, String
         if (iterableApiRequest != null) {
             URL url;
             HttpURLConnection urlConnection = null;
-
             try {
                 url = new URL(iterableApiRequest.resourcePath);
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -58,6 +58,8 @@ class IterableRequest extends AsyncTask<IterableDeeplinkApiRequest, Void, String
                 if (responseCode >= 300 && responseCode < 400) {
                     String newUrl = urlConnection.getHeaderField(LOCATION_HEADER_FIELD);
                     requestResult = newUrl;
+                } else if (responseCode >= 500) {
+                    retryRequest = true;
                 } else {
                     //pass back original url
                     requestResult = url.toString();

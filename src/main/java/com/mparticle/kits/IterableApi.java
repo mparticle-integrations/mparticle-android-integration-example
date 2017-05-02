@@ -23,10 +23,14 @@ public class IterableApi {
                 IterableDeeplinkApiRequest request = new IterableDeeplinkApiRequest(uri, onCallback);
                 new IterableRequest().execute(request);
             } else {
-                onCallback.execute(uri);
+                if (onCallback != null) {
+                    onCallback.execute(uri);
+                }
             }
         } else {
-            onCallback.execute(null);
+            if (onCallback != null) {
+                onCallback.execute(null);
+            }
         }
     }
 
