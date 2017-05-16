@@ -10,15 +10,15 @@ This repository contains the [Example](https://www.example.com/) integration for
 
     ```groovy
     dependencies {
-        compile 'com.mparticle:android-example-kit:4+'
+        compile 'com.mparticle:android-iterable-kit:4+'
     }
     ```
-2. Follow the mParticle Android SDK [quick-start](https://github.com/mParticle/mparticle-android-sdk), then rebuild and launch your app, and verify that you see `"<REPLACE ME> detected"` in the output of `adb logcat`.
+2. Follow the mParticle Android SDK [quick-start](https://github.com/mParticle/mparticle-android-sdk), then rebuild and launch your app, and verify that you see `"iterable detected"` in the output of `adb logcat`.
 3. Reference mParticle's integration docs below to enable the integration.
 
 ### Documentation
 
-[Example integration](http://docs.mparticle.com/?java#REPLACEME)
+[Iterable integration](http://docs.mparticle.com/?java#iterable)
 
 ### License
 
