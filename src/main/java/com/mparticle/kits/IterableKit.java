@@ -6,8 +6,10 @@ import android.os.Bundle;
 
 import com.mparticle.DeepLinkResult;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -16,7 +18,8 @@ import java.util.Map;
  */
 public class IterableKit extends KitIntegration implements KitIntegration.ActivityListener {
 
-   private String deeplinkUrl;
+    private String deeplinkUrl;
+    private Set<String> previousLinks = new HashSet<String>();
 
     @Override
     protected List<ReportingMessage> onKitCreate(Map<String, String> settings, Context context) {
@@ -35,18 +38,11 @@ public class IterableKit extends KitIntegration implements KitIntegration.Activi
 
     @Override
     public void checkForDeepLink() {
-        IterableHelper.IterableActionHandler clickCallback = new IterableHelper.IterableActionHandler(){
-            @Override
-            public void execute(String result) {
-            DeepLinkResult deepLinkResult = new DeepLinkResult().setLink(result);
+        if(!KitUtils.isEmpty(deeplinkUrl)) {
+            DeepLinkResult deepLinkResult = new DeepLinkResult().setLink(deeplinkUrl);
             deepLinkResult.setServiceProviderId(getConfiguration().getKitId());
-            if(!KitUtils.isEmpty(result)) {
-                getKitManager().onResult(deepLinkResult);
-            }
-            }
-        };
-
-        IterableApi.getAndTrackDeeplink(deeplinkUrl, clickCallback);
+            getKitManager().onResult(deepLinkResult);
+        }
     }
 
     @Override
@@ -61,7 +57,20 @@ public class IterableKit extends KitIntegration implements KitIntegration.Activi
 
     @Override
     public List<ReportingMessage> onActivityResumed(Activity activity) {
-        deeplinkUrl = activity.getIntent().getDataString();
+        String currentLink = activity.getIntent().getDataString();
+
+        if (currentLink != null && !currentLink.isEmpty() && !previousLinks.contains(currentLink)){
+            previousLinks.add(currentLink);
+            IterableHelper.IterableActionHandler clickCallback = new IterableHelper.IterableActionHandler() {
+                @Override
+                public void execute(String result) {
+                    deeplinkUrl = result;
+                }
+            };
+
+            IterableApi.getAndTrackDeeplink(currentLink, clickCallback);
+        }
+
         return null;
     }
 
