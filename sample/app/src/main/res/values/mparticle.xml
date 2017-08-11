@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- ex. src/main/res/values/mparticle.xml -->
+<resources>
+    <bool name="mp_enableDebugMode">true</bool>
+    <bool name="mp_enablePush">true</bool>
+    <string name="mp_pushSenderId">433406026043</string>
+    <string name="mp_key">03b7f667f2fbd2439f97b46fd3604c93</string>
+    <string name="mp_secret">oHH9T5ggscXaE3MZBivn1wDwE2-GyvWDN9cXGXXKpEhp4JvVWXMO0ML6h4wyE8ae</string>
+</resources>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/user_email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:hint="User email" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="horizontal">
+        <Button
+            android:id="@+id/set_user"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Set User" />
+        <Button
+            android:id="@+id/logout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Logout" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/user_property_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:hint="User property"
+        android:layout_marginTop="30dp"/>
+
+    <EditText
+        android:id="@+id/user_property_value"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:hint="User property" />
+
+    <Button
+        android:id="@+id/set_user_property"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Set User Property" />
+
+
+</LinearLayout>
