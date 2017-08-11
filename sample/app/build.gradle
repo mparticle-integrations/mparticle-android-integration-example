@@ -1,0 +1,42 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+    defaultConfig {
+        applicationId "com.rokolabs.mparticle.sample"
+        minSdkVersion 23
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+repositories {
+    maven {
+        url 'https://artifactory.roko.mobi/artifactory/libs-release'
+    }
+}
+
+dependencies {
+    implementation 'com.mparticle:android-core:4.+'
+    implementation ('com.mparticle:android-rokomobi-kit:4.+')
+
+    implementation 'com.android.support:appcompat-v7:25.4.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.android.support:design:25.4.0'
+    implementation 'com.google.firebase:firebase-messaging:9.8.0'
+    implementation 'com.android.support:multidex:1.0.2'
+}
+apply plugin: 'com.google.gms.google-services'

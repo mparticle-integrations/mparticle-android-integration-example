@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pages">
+        <item>User</item>
+        <item>Instabot</item>
+        <item>Events</item>
+    </string-array>
+</resources>
