@@ -11,11 +11,19 @@ buildscript {
 
 apply plugin: 'com.mparticle.kit'
 
+repositories {
+    maven { url "https://github.com/taplytics/Taplytics-Android-SDK/raw/master/AndroidStudio/" }
+}
+
 dependencies {
-    //TODO: Option 1: Replace with your Maven Central Dependency (preferred)
-    //compile 'com.example:example-artifact:1.2.3'
+    compile 'com.taplytics.sdk:taplytics:+@aar'
 
     //TODO: Option 2: Include your jar in ./libs only if you're not in Maven Central
     //TODO:           Please name the jar based on the version, ie AcmeSDK1234.jar
-    //compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    //Volley
+    compile 'com.android.volley:volley:+'
+
+    //Only include this if you wish to enable push notifications:
+    compile("com.google.android.gms:play-services-gcm:9.+")
 }
