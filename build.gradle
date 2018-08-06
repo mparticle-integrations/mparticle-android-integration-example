@@ -2,19 +2,33 @@ buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
+        jcenter()
+        google()
     }
     dependencies {
         classpath 'com.mparticle:android-kit-plugin:+'
     }
 }
 
+allprojects {
+    group = 'com.mparticle'
+    version = '5.3.6-SNAPSHOT'
+    if (project.hasProperty('isRelease') && project.isRelease) {
+        version = version.toString().replace("-SNAPSHOT", "")
+    }
+    repositories {
+        mavenLocal()
+        google()
+        jcenter()
+    }
+}
+
 apply plugin: 'com.mparticle.kit'
 
 dependencies {
-    //TODO: Option 1: Replace with your Maven Central Dependency (preferred)
-    //compile 'com.example:example-artifact:1.2.3'
+    compile 'com.appsee:appsee-android:+'
+}
 
-    //TODO: Option 2: Include your jar in ./libs only if you're not in Maven Central
-    //TODO:           Please name the jar based on the version, ie AcmeSDK1234.jar
-    //compile fileTree(dir: 'libs', include: ['*.jar'])
+repositories {
+    google()
 }
