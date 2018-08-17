@@ -23,6 +23,8 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
     //Volley
     compile 'com.android.volley:volley:+'
+    //Retrofit2
+    compile 'com.squareup.retrofit2:retrofit:+'
 
     //Only include this if you wish to enable push notifications:
     compile("com.google.android.gms:play-services-gcm:9.+")

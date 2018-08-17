@@ -1,9 +1,26 @@
 package com.mparticle.kits;
 
 import android.content.Context;
+import android.text.TextUtils;
+import android.support.annotation.Keep;
+
+import org.json.JSONException;
 
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.Collections;
+import java.math.BigDecimal;
+
+import com.mparticle.MPEvent;
+import com.mparticle.MParticle;
+import com.mparticle.MParticleOptions;
+import com.mparticle.MParticleTask;
+import com.mparticle.commerce.CommerceEvent;
+import com.mparticle.commerce.Product;
+import com.mparticle.commerce.TransactionAttributes;
+import com.mparticle.identity.IdentityApiRequest;
+import com.mparticle.identity.IdentityApiResult;
 
 import com.taplytics.sdk.SessionInfoRetrievedListener;
 import com.taplytics.sdk.Taplytics;
@@ -38,20 +55,13 @@ public class TaplyticsKit extends KitIntegration
         KitIntegration.AttributeListener,
         KitIntegration.EventListener,
         KitIntegration.CommerceListener,
-        KitIntegration.ApplicationStateListener,
-        KitIntegration.PushListener {
+        KitIntegration.ApplicationStateListener {
 
     /**
      * Option Keys
      */
-    private static final String API_KEY = "api_key";
-    private static final String LIVE_UPDATE = "liveUpdate";
-    private static final String SHAKE_MENU = "shakeMenu";
-    private static final String AGGRESSIVE = "aggressive";
-    private static final String SESSION_MINUTES = "sessionMinutes";
-    private static final String TURN_MENU = "turnMenu";
-    private static final String DISABLE_BORDERS = "disableBorders";
-    private static final String RETROFIT = "retrofit";
+    private static final String API_KEY = "apiKey";
+    private static final String AGGRESSIVE = "TaplyticsOptionAggressive";
 
     /**
      * Event Keys
@@ -59,17 +69,24 @@ public class TaplyticsKit extends KitIntegration
     public static final String EventAppBackground = "appBackground";
     public static final String EventAppForeground = "appForeground";
 
+    private static Map<String, Object> tlOptions;
+
+    public static void setTlOptions(Map<String, Object> options) {
+        tlOptions = options;
+    }
+
+    private HashMap<String, Object> mergeOptions(Map<String, Object> tlOptions, Map<String, Object> configuration) {
+        HashMap<String, Object> merged = new HashMap<>(configuration);
+        for (Map.Entry<String, Object> entry : tlOptions.entrySet()) {
+            merged.put(entry.getKey(), entry.getValue());
+        }
+        return merged;
+    }
+
     @Override
     protected List<ReportingMessage> onKitCreate(Map<String, String> settings, Context context) {
-        /** TODO: Initialize your SDK here
-         * This method is analogous to Application#onCreate, and will be called once per app execution.
-         *
-         * If for some reason you can't start your SDK (such as settings are not present), you *must* throw an Exception
-         *
-         * If you forward any events on startup that are analagous to any mParticle messages types, return them here
-         * as ReportingMessage objects. Otherwise, return null.
-         */
 
+        tlOptions = new HashMap<>();
         startTaplytics(settings, context);
 
         return null;
@@ -91,7 +108,7 @@ public class TaplyticsKit extends KitIntegration
     }
 
     private List<ReportingMessage> createReportingMessages(String message) {
-        return Collections.singletonList(createReportingMessages(message));
+        return Collections.singletonList(createReportMessage(message));
     }
 
     /**
@@ -101,8 +118,13 @@ public class TaplyticsKit extends KitIntegration
      */
 
     private void startTaplytics(Map<String, String> settings, Context context) {
+        System.out.println("settings" + settings);
         String apiKey = getAPIKey(settings);
-        Map<String, Object> options = getOptions(settings);
+        HashMap<String, Object> options = mergeOptions(tlOptions, getOptionsFromConfiguration(settings));
+        System.out.println("TLOptions" + tlOptions);
+        System.out.println("merged options" + options);
+        options.put("debugLogging", true);
+        options.put("retroFit", true);
 
         if (options != null) {
             Taplytics.startTaplytics(context, apiKey, options);
@@ -126,56 +148,16 @@ public class TaplyticsKit extends KitIntegration
      * @return
      */
 
-    private Map<String, Object> getOptions(Map<String, String> settings) {
+    private Map<String, Object> getOptionsFromConfiguration(Map<String, String> settings) {
         Map<String, Object> options = new HashMap<>();
-
-        addLiveUpdateOption(options, settings);
-        addShakeMenuOption(options, settings);
         addAggressiveOption(options, settings);
-        addSessionMinutesOption(options, settings);
-        addTurnMenuOption(options, settings);
-        addDisableBordersOption(options, settings);
-        addRetrofitOption(options, settings);
 
         return options.isEmpty() ? null : options;
     }
 
-    private void addLiveUpdateOption(Map<String, Object> options, Map<String, String> settings) {
-        Boolean liveUpdate = Boolean.parseBoolean(settings.get(LIVE_UPDATE));
-        options.set(liveUpdate.booleanValue());
-    }
-
-    private void addShakeMenuOption(Map<String, Object> options, Map<String, String> settings) {
-        Boolean shakeMenu = Boolean.parseBoolean(settings.get(SHAKE_MENU));
-        options.set(shakeMenu.booleanValue());
-    }
-
     private void addAggressiveOption(Map<String, Object> options, Map<String, String> settings) {
         Boolean agg = Boolean.parseBoolean(settings.get(AGGRESSIVE));
-        options.set(agg.booleanValue());
-    }
-
-    private void addSessionMinutesOption(Map<String, Object> options, Map<String, String> settings) {
-        try {
-            final Long l = Long.parseLong(settings.get(SESSION_MINUTES));
-            options.set(l);
-        } catch (NumberFormatException nfe) {
-        }
-    }
-
-    private void addTurnMenuOption(Map<String, Object> options, Map<String, String> settings) {
-        Boolean turnMenu = Boolean.parseBoolean(settings.get(TURN_MENU));
-        options.set(turnMenu.booleanValue());
-    }
-
-    private void addDisableBordersOption(Map<String, Object> options, Map<String, String> settings) {
-        Boolean disableBorders = Boolean.parseBoolean(settings.get(DISABLE_BORDERS));
-        options.set(disableBorders.booleanValue());
-    }
-
-    private void addRetrofitOption(Map<String, Object> options, Map<String, String> settings) {
-        Boolean retrofit = Boolean.parseBoolean(settings.get(RETROFIT));
-        options.set(retrofit.booleanValue());
+        options.put("aggressive", agg.booleanValue());
     }
 
     @Override
@@ -199,9 +181,7 @@ public class TaplyticsKit extends KitIntegration
     }
 
     @Override
-    public boolean supportsAttributeLists() {
-        return false;
-    }
+    public boolean supportsAttributeLists() { return false; }
 
     @Override
     public void setAllUserAttributes(Map<String, String> attributes, Map<String, List<String>> attributeLists) {
@@ -225,6 +205,18 @@ public class TaplyticsKit extends KitIntegration
         setUserIdentity(identityType, null);
     }
 
+    /*
+        Unsupported methods
+     */
+    @Override
+    public List<ReportingMessage> logout() { return null; }
+
+    @Override
+    public void removeUserAttribute(String attribute) { }
+
+    @Override
+    public void setUserAttributeList(String attribute, List<String> attributeValueList) { }
+
     /**
      * CommerceListener Interface
      */
@@ -240,6 +232,13 @@ public class TaplyticsKit extends KitIntegration
         return createReportingMessages(ReportingMessage.MessageType.COMMERCE_EVENT);
     }
 
+    /*
+        Unsupported Methods
+     */
+
+    @Override
+    public List<ReportingMessage> logLtvIncrease(BigDecimal valueIncreased, BigDecimal valueTotal, String eventName, Map<String, String> contextInfo) { return null; }
+
     /**
      * EventListener Interface
      */
@@ -253,9 +252,22 @@ public class TaplyticsKit extends KitIntegration
 
     @Override
     public List<ReportingMessage> logScreen(String screenName, Map<String, String> screenAttributes) {
-
+        Taplytics.logEvent(screenName);
         return createReportingMessages(ReportingMessage.MessageType.SCREEN_VIEW);
     }
+
+    /*
+        Unsupported Methods
+     */
+
+    @Override
+    public List<ReportingMessage> logException(Exception exception, Map<String, String> exceptionAttributes, String message) { return null; }
+
+    @Override
+    public List<ReportingMessage> logError(String message, Map<String, String> errorAttributes) { return null; }
+
+    @Override
+    public List<ReportingMessage> leaveBreadcrumb(String breadcrumb) { return null; }
 
     /**
      * ApplicationStateListener Interface
@@ -280,9 +292,9 @@ public class TaplyticsKit extends KitIntegration
     @Override
     public List<ReportingMessage> setOptOut(boolean optedOut) {
         if (optedOut) {
-            Taplytics.optOutTracking(this);
+            Taplytics.optOutUserTracking(null);
         } else {
-            Taplytics.optInTracking(this);
+            Taplytics.optInUserTracking(null);
         }
         return createReportingMessages(ReportingMessage.MessageType.OPT_OUT);
     }
