@@ -25,6 +25,7 @@ import com.mparticle.identity.IdentityApiResult;
 import com.taplytics.sdk.SessionInfoRetrievedListener;
 import com.taplytics.sdk.Taplytics;
 import com.taplytics.sdk.TaplyticsExperimentsLoadedListener;
+import com.taplytics.sdk.TaplyticsHasUserOptedOutListener;
 
 import org.json.JSONObject;
 
@@ -301,12 +302,18 @@ public class TaplyticsKit extends KitIntegration
      */
 
     @Override
-    public List<ReportingMessage> setOptOut(boolean optedOut) {
-        if (optedOut) {
-            Taplytics.optOutUserTracking(null);
-        } else {
-            Taplytics.optInUserTracking(null);
-        }
+    public List<ReportingMessage> setOptOut(final boolean optedOut) {
+        Taplytics.hasUserOptedOutTracking(null, new TaplyticsHasUserOptedOutListener() {
+            @Override
+            public void hasUserOptedOutTracking(boolean hasOptedOut) {
+                if (!hasOptedOut && optedOut) {
+                    Taplytics.optOutUserTracking(null);
+                } else if (hasOptedOut && !optedOut) {
+                    Taplytics.optInUserTracking(null);
+                }
+            }
+        });
+
         return createReportingMessages(ReportingMessage.MessageType.OPT_OUT);
     }
 }
