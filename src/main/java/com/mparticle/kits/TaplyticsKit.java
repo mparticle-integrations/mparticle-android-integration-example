@@ -62,14 +62,22 @@ public class TaplyticsKit extends KitIntegration
      */
     private static final String API_KEY = "apiKey";
     private static final String AGGRESSIVE = "TaplyticsOptionAggressive";
+    private static final String USER_ID = "user_id";
+    private static final String EMAIL = "email";
 
     /**
      * Event Keys
      */
-    public static final String EventAppBackground = "appBackground";
-    public static final String EventAppForeground = "appForeground";
+    private static final String EventAppBackground = "appBackground";
+    private static final String EventAppForeground = "appForeground";
+
+    /**
+     * tlOptions get and set methods
+     */
 
     private static Map<String, Object> tlOptions;
+
+    public static Map<String, Object> getTlOptions() { return tlOptions; }
 
     public static void setTlOptions(Map<String, Object> options) {
         tlOptions = options;
@@ -85,10 +93,7 @@ public class TaplyticsKit extends KitIntegration
 
     @Override
     protected List<ReportingMessage> onKitCreate(Map<String, String> settings, Context context) {
-
-        tlOptions = new HashMap<>();
         startTaplytics(settings, context);
-
         return null;
     }
 
@@ -118,13 +123,9 @@ public class TaplyticsKit extends KitIntegration
      */
 
     private void startTaplytics(Map<String, String> settings, Context context) {
-        System.out.println("settings" + settings);
         String apiKey = getAPIKey(settings);
-        HashMap<String, Object> options = mergeOptions(tlOptions, getOptionsFromConfiguration(settings));
-        System.out.println("TLOptions" + tlOptions);
-        System.out.println("merged options" + options);
-        options.put("debugLogging", true);
-        options.put("retroFit", true);
+        HashMap<String, Object> options = mergeOptions(getTlOptions(), getOptionsFromConfiguration(settings));
+        options.put("delayedStartTaplytics", true);
 
         if (options != null) {
             Taplytics.startTaplytics(context, apiKey, options);
@@ -194,8 +195,11 @@ public class TaplyticsKit extends KitIntegration
     public void setUserIdentity(MParticle.IdentityType identityType, String identity) {
         switch (identityType) {
             case CustomerId: {
-                setUserAttribute("user_id", identity);
+                setUserAttribute(USER_ID, identity);
                 break;
+            }
+            case Email: {
+                setUserAttribute(EMAIL, identity);
             }
         }
     }
@@ -223,12 +227,19 @@ public class TaplyticsKit extends KitIntegration
 
     @Override
     public List<ReportingMessage> logEvent(CommerceEvent event) {
-        String eventName = event.getEventName();
-        int checkoutStep = event.getCheckoutStep().intValue();
-        if (eventName.isEmpty()) {
+        TransactionAttributes transactionAttributes = event.getTransactionAttributes();
+        String id = transactionAttributes.getId();
+        Double revenue = transactionAttributes.getRevenue();
+
+        if (transactionAttributes == null) {
             return null;
         }
-        Taplytics.logRevenue(eventName, checkoutStep);
+
+        if (id == null || revenue == null) {
+            return null;
+        }
+
+        Taplytics.logRevenue(id, revenue);
         return createReportingMessages(ReportingMessage.MessageType.COMMERCE_EVENT);
     }
 
