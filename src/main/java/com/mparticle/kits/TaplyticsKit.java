@@ -94,6 +94,9 @@ public class TaplyticsKit extends KitIntegration
 
     @Override
     protected List<ReportingMessage> onKitCreate(Map<String, String> settings, Context context) {
+        if (tlOptions == null) {
+            tlOptions = new HashMap<>();
+        }
         startTaplytics(settings, context);
         return null;
     }
