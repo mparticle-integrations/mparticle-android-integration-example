@@ -1,34 +1,22 @@
 buildscript {
     repositories {
-        mavenLocal()
-        mavenCentral()
-        jcenter()
         google()
+        mavenLocal()
+        jcenter()
     }
     dependencies {
-        classpath 'com.mparticle:android-kit-plugin:+'
-    }
-}
-
-allprojects {
-    group = 'com.mparticle'
-    version = '5.3.6-SNAPSHOT'
-    if (project.hasProperty('isRelease') && project.isRelease) {
-        version = version.toString().replace("-SNAPSHOT", "")
-    }
-    repositories {
-        mavenLocal()
-        google()
-        jcenter()
+        classpath 'com.mparticle:android-kit-plugin:' + project.version
     }
 }
 
 apply plugin: 'com.mparticle.kit'
 
-dependencies {
-    compile 'com.appsee:appsee-android:+'
+android {
+    defaultConfig {
+        minSdkVersion 14
+    }
 }
 
-repositories {
-    google()
+dependencies {
+    api 'com.appsee:appsee-android:2.4.4'
 }
