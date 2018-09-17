@@ -16,16 +16,6 @@ repositories {
 }
 
 dependencies {
-    compile 'com.taplytics.sdk:taplytics:+@aar'
-
-    //TODO: Option 2: Include your jar in ./libs only if you're not in Maven Central
-    //TODO:           Please name the jar based on the version, ie AcmeSDK1234.jar
-    compile fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
-    //Volley
-    compile 'com.android.volley:volley:+'
-    //Retrofit2
-    compile 'com.squareup.retrofit2:retrofit:+'
-
-    //Only include this if you wish to enable push notifications:
-    compile("com.google.android.gms:play-services-gcm:9.+")
+    implementation 'com.taplytics.sdk:taplytics:1.29.0@aar'
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
 }

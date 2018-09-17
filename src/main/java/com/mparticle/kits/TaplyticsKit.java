@@ -1,8 +1,6 @@
 package com.mparticle.kits;
 
 import android.content.Context;
-import android.text.TextUtils;
-import android.support.annotation.Keep;
 
 import org.json.JSONException;
 
@@ -54,7 +52,7 @@ public class TaplyticsKit extends KitIntegration
      * tlOptions get and set methods
      */
 
-    private static Map<String, Object> tlOptions;
+    private static Map<String, Object> tlOptions = new HashMap<>();
 
     public static Map<String, Object> getTlOptions() { return tlOptions; }
 
@@ -64,8 +62,11 @@ public class TaplyticsKit extends KitIntegration
 
     private HashMap<String, Object> mergeOptions(Map<String, Object> tlOptions, Map<String, Object> configuration) {
         HashMap<String, Object> merged = new HashMap<>(configuration);
-        for (Map.Entry<String, Object> entry : tlOptions.entrySet()) {
-            merged.put(entry.getKey(), entry.getValue());
+
+        if (tlOptions != null) {
+            for (Map.Entry<String, Object> entry : tlOptions.entrySet()) {
+                merged.put(entry.getKey(), entry.getValue());
+            }
         }
         return merged;
     }
@@ -119,8 +120,8 @@ public class TaplyticsKit extends KitIntegration
 
     private String getAPIKey(Map<String, String> settings) {
         final String apiKey = getSettings().get(API_KEY);
-        if (TextUtils.isEmpty(apiKey)) {
-            throw new IllegalArgumentException(API_KEY);
+        if (KitUtils.isEmpty(apiKey)) {
+            throw new IllegalArgumentException("Failed to initialize Taplytics SDK - an API key is required");
         }
         return apiKey;
     }
@@ -191,14 +192,17 @@ public class TaplyticsKit extends KitIntegration
         setUserIdentity(identityType, null);
     }
 
+
+    @Override
+    public void removeUserAttribute(String attribute) {
+        setUserAttribute(attribute, null);
+    }
+
     /*
         Unsupported methods
      */
     @Override
     public List<ReportingMessage> logout() { return null; }
-
-    @Override
-    public void removeUserAttribute(String attribute) { }
 
     @Override
     public void setUserAttributeList(String attribute, List<String> attributeValueList) { }
@@ -209,20 +213,26 @@ public class TaplyticsKit extends KitIntegration
 
     @Override
     public List<ReportingMessage> logEvent(CommerceEvent event) {
-        TransactionAttributes transactionAttributes = event.getTransactionAttributes();
-        String id = transactionAttributes.getId();
-        Double revenue = transactionAttributes.getRevenue();
+        if (!KitUtils.isEmpty(event.getProductAction()) &&
+                event.getProductAction().equalsIgnoreCase(Product.PURCHASE)) {
 
-        if (transactionAttributes == null) {
-            return null;
+            TransactionAttributes transactionAttributes = event.getTransactionAttributes();
+
+            if (transactionAttributes == null) {
+                return null;
+            }
+
+            String id = transactionAttributes.getId();
+            Double revenue = transactionAttributes.getRevenue();
+
+            if (id == null || revenue == null) {
+                return null;
+            }
+
+            Taplytics.logRevenue(id, revenue);
+            return createReportingMessages(ReportingMessage.MessageType.COMMERCE_EVENT);
         }
-
-        if (id == null || revenue == null) {
-            return null;
-        }
-
-        Taplytics.logRevenue(id, revenue);
-        return createReportingMessages(ReportingMessage.MessageType.COMMERCE_EVENT);
+        return null;
     }
 
     /*
