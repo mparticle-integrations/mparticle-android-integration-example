@@ -31,8 +31,7 @@ public class TaplyticsKit extends KitIntegration
         implements
         KitIntegration.AttributeListener,
         KitIntegration.EventListener,
-        KitIntegration.CommerceListener,
-        KitIntegration.ApplicationStateListener {
+        KitIntegration.CommerceListener {
 
     /**
      * Option Keys
@@ -41,12 +40,6 @@ public class TaplyticsKit extends KitIntegration
     private static final String AGGRESSIVE = "TaplyticsOptionAggressive";
     private static final String USER_ID = "user_id";
     private static final String EMAIL = "email";
-
-    /**
-     * Event Keys
-     */
-    private static final String EventAppBackground = "appBackground";
-    private static final String EventAppForeground = "appForeground";
 
     /**
      * tlOptions get and set methods
@@ -271,20 +264,6 @@ public class TaplyticsKit extends KitIntegration
 
     @Override
     public List<ReportingMessage> leaveBreadcrumb(String breadcrumb) { return null; }
-
-    /**
-     * ApplicationStateListener Interface
-     */
-
-    @Override
-    public void onApplicationForeground() {
-        Taplytics.logEvent(EventAppForeground);
-    }
-
-    @Override
-    public void onApplicationBackground() {
-        Taplytics.logEvent(EventAppBackground);
-    }
 
     /**
      * Set opt out for Taplytics
