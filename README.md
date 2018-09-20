@@ -1,4 +1,4 @@
-## Example Kit Integration
+## FollowAnalytics Kit Integration
 
 [See here for more information](https://github.com/mParticle/mparticle-android-sdk/wiki/Kit-Development) on how to use this example to write a new kit.
 
@@ -22,4 +22,4 @@ This repository contains the [Example](https://www.example.com/) integration for
 
 ### License
 
-[Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+[Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)\
