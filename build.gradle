@@ -20,5 +20,5 @@ allprojects {
 }
 
 dependencies {
-    implementation "com.followapps.android:sdk:5.6.1"
+    implementation "com.followapps.android:sdk:6.0.0"
 }
