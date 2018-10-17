@@ -10,7 +10,8 @@ import com.mparticle.MPEvent;
 import com.mparticle.MParticle;
 import com.followanalytics.FollowAnalytics;
 
-public class FollowAnalyticsKit extends KitIntegration implements KitIntegration.EventListener {
+public class FollowAnalyticsKit extends KitIntegration implements KitIntegration.EventListener,
+        KitIntegration.AttributeListener {
 
     @Override
     protected List<ReportingMessage> onKitCreate(Map<String, String> settings, Context context) {
@@ -33,6 +34,7 @@ public class FollowAnalyticsKit extends KitIntegration implements KitIntegration
         return null;
     }
 
+    // Events
     @Override
     public List<ReportingMessage> logScreen(String screenName, Map<String, String> eventAttributes) {
         return null;
@@ -64,6 +66,71 @@ public class FollowAnalyticsKit extends KitIntegration implements KitIntegration
     @Override
     public List<ReportingMessage> leaveBreadcrumb(String breadcrumb) {
         return null;
+    }
+
+    // Attributes
+    @Override
+    public List<ReportingMessage> logout() {
+        return null;
+    }
+
+    @Override
+    public void setUserAttribute(String key, String value) {
+        switch(key) {
+            case MParticle.UserAttributes.GENDER :
+                FollowAnalytics.UserAttributes.setGender(Integer.parseInt(value));
+                break;
+            case MParticle.UserAttributes.COUNTRY :
+                FollowAnalytics.UserAttributes.setCountry(value);
+                break;
+            case MParticle.UserAttributes.CITY :
+                FollowAnalytics.UserAttributes.setCity(value);
+                break;
+            case MParticle.UserAttributes.FIRSTNAME :
+                FollowAnalytics.UserAttributes.setFirstName(value);
+                break;
+            case MParticle.UserAttributes.LASTNAME :
+                FollowAnalytics.UserAttributes.setLastName(value);
+                break;
+            default :
+                FollowAnalytics.UserAttributes.setString(key, value);
+                break;
+
+        }
+    }
+
+    @Override
+    public void removeUserAttribute(String key) {
+        FollowAnalytics.UserAttributes.clear(key);
+    }
+
+    @Override
+    public void setUserAttributeList(String s, List<String> list) { }
+
+    @Override
+    public void setUserIdentity(MParticle.IdentityType identityType, String id) {
+        if (identityType.equals(MParticle.IdentityType.CustomerId)) {
+            FollowAnalytics.setUserId(id);
+        }
+    }
+
+    @Override
+    public void removeUserIdentity(MParticle.IdentityType identityType) {
+        if (identityType.equals(MParticle.IdentityType.CustomerId)) {
+            FollowAnalytics.setUserId(null);
+        }
+    }
+
+    @Override
+    public void setAllUserAttributes(Map<String, String> attributes, Map<String, List<String>> attributeLists) {
+        for (Map.Entry<String, String> entry : attributes.entrySet()){
+            setUserAttribute(entry.getKey(), entry.getValue());
+        }
+    }
+
+    @Override
+    public boolean supportsAttributeLists() {
+        return false;
     }
 
 }
