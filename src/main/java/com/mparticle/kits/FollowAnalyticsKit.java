@@ -95,7 +95,6 @@ public class FollowAnalyticsKit extends KitIntegration implements KitIntegration
             default :
                 FollowAnalytics.UserAttributes.setString(key, value);
                 break;
-
         }
     }
 
@@ -105,7 +104,7 @@ public class FollowAnalyticsKit extends KitIntegration implements KitIntegration
     }
 
     @Override
-    public void setUserAttributeList(String s, List<String> list) { }
+    public void setUserAttributeList(String key, List<String> list) { }
 
     @Override
     public void setUserIdentity(MParticle.IdentityType identityType, String id) {
@@ -129,8 +128,6 @@ public class FollowAnalyticsKit extends KitIntegration implements KitIntegration
     }
 
     @Override
-    public boolean supportsAttributeLists() {
-        return false;
-    }
+    public boolean supportsAttributeLists() { return false; }
 
 }
