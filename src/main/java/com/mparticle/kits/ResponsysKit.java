@@ -42,6 +42,7 @@ public class ResponsysKit extends KitIntegration implements KitIntegration.PushL
 
     @Override
     protected List<ReportingMessage> onKitCreate(Map<String, String> settings, Context context) {
+        PIOLogger.d("Responsys Kit detected");
         PIOLogger.v("RK oKC");
 
         final String apiKey = settings.get("apiKey");
