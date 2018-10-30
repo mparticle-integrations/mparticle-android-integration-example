@@ -21,7 +21,7 @@ This repository contains the [Responsys](https://docs.oracle.com/cloud/latest/ma
 
 ### Documentation
 
-[Responsys integration](http://docs.mparticle.com/?java#Responsys)
+[Responsys integration](https://docs.mparticle.com/integrations/oracle-responsys/)
 
 ### License
 
