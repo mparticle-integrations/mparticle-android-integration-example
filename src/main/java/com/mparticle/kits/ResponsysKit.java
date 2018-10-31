@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.mparticle.MParticle.IdentityType.Email;
+import static com.mparticle.MParticle.IdentityType.CustomerId;
 
 public class ResponsysKit extends KitIntegration implements KitIntegration.PushListener,
         KitIntegration.EventListener,
@@ -31,7 +31,10 @@ public class ResponsysKit extends KitIntegration implements KitIntegration.PushL
         KitIntegration.IdentityListener {
 
     public static final String CUSTOM_FLAG_IAM = "Responsys.Custom.iam";
-    public static final String CUSTOM_FLAG_PREFS = "Responsys.Custom.prefs";
+    public static final String ENGAGEMENT_METRIC_PREMIUM_CONTENT =  "ResponsysEngagementTypePremium";
+    public static final String ENGAGEMENT_METRIC_INAPP_PURCHASE = "ResponsysEngagementTypePurchase";
+    public static final String ENGAGEMENT_METRIC_OTHER = "ResponsysEngagementTypeOther";
+    public static final String ENGAGEMENT_METRIC_SOCIAL = "ResponsysEngagementTypeSocial";
 
     private PushIOManager mPushIOManager;
 
@@ -185,7 +188,14 @@ public class ResponsysKit extends KitIntegration implements KitIntegration.PushL
         List<ReportingMessage> reportingMessages = new ArrayList<>();
 
         final Map<String, List<String>> customFlags = mpEvent.getCustomFlags();
+        if (customFlags != null && customFlags.containsKey(CUSTOM_FLAG_IAM)) {
+            mPushIOManager.trackEvent(mpEvent.getEventName());
+            reportingMessages.add(ReportingMessage.fromEvent(this, mpEvent));
+            return reportingMessages;
+        }
+
         final EventType eventType = mpEvent.getEventType();
+        final String eventName = mpEvent.getEventName();
 
         PIOLogger.v("RK lE event type: " + eventType);
 
@@ -195,31 +205,44 @@ public class ResponsysKit extends KitIntegration implements KitIntegration.PushL
                 reportingMessages.add(ReportingMessage.fromEvent(this, mpEvent));
                 break;
             case Social:
-                mPushIOManager.trackEngagement(PushIOManager.PUSHIO_ENGAGEMENT_METRIC_SOCIAL);
-                reportingMessages.add(ReportingMessage.fromEvent(this, mpEvent));
+                if(!KitUtils.isEmpty(eventName)) {
+                    if(eventName.equalsIgnoreCase(ENGAGEMENT_METRIC_SOCIAL)) {
+                        mPushIOManager.trackEngagement(PushIOManager.PUSHIO_ENGAGEMENT_METRIC_SOCIAL);
+                        reportingMessages.add(ReportingMessage.fromEvent(this, mpEvent));
+                    }
+                }
                 break;
             case UserPreference:
-                if (customFlags != null && customFlags.containsKey(CUSTOM_FLAG_PREFS)) {
-                    Map<String, String> eventInfo = mpEvent.getInfo();
-                    if (eventInfo != null) {
-                        for (Map.Entry<String, String> entry : eventInfo.entrySet()) {
-                            try {
-                                mPushIOManager.declarePreference(entry.getKey(), entry.getKey(), PushIOPreference.Type.STRING);
-                                mPushIOManager.setPreference(entry.getKey(), entry.getValue());
-                            } catch (ValidationException e) {
-                                PIOLogger.v("RK lE ValidationException: " + e.getMessage());
-                            }
+                Map<String, String> eventInfo = mpEvent.getInfo();
+                if (eventInfo != null) {
+                    for (Map.Entry<String, String> entry : eventInfo.entrySet()) {
+                        try {
+                            mPushIOManager.declarePreference(entry.getKey(), entry.getKey(), PushIOPreference.Type.STRING);
+                            mPushIOManager.setPreference(entry.getKey(), entry.getValue());
+                        } catch (ValidationException e) {
+                            PIOLogger.v("RK lE ValidationException: " + e.getMessage());
                         }
                     }
                 }
                 break;
-            case Other:
-                if (customFlags != null && customFlags.containsKey(CUSTOM_FLAG_IAM)) {
-                    mPushIOManager.trackEvent(mpEvent.getEventName());
-                } else {
-                    mPushIOManager.trackEngagement(PushIOManager.PUSHIO_ENGAGEMENT_METRIC_OTHER);
+            case Transaction:
+                if(!KitUtils.isEmpty(eventName)) {
+                    if(eventName.equalsIgnoreCase(ENGAGEMENT_METRIC_INAPP_PURCHASE)) {
+                        mPushIOManager.trackEngagement(PushIOManager.PUSHIO_ENGAGEMENT_METRIC_INAPP_PURCHASE);
+                        reportingMessages.add(ReportingMessage.fromEvent(this, mpEvent));
+                    }else if(eventName.equalsIgnoreCase(ENGAGEMENT_METRIC_PREMIUM_CONTENT)){
+                        mPushIOManager.trackEngagement(PushIOManager.PUSHIO_ENGAGEMENT_METRIC_PREMIUM_CONTENT);
+                        reportingMessages.add(ReportingMessage.fromEvent(this, mpEvent));
+                    }
                 }
-                reportingMessages.add(ReportingMessage.fromEvent(this, mpEvent));
+                break;
+            case Other:
+                if(!KitUtils.isEmpty(eventName)) {
+                    if (eventName.equalsIgnoreCase(ENGAGEMENT_METRIC_OTHER)) {
+                        mPushIOManager.trackEngagement(PushIOManager.PUSHIO_ENGAGEMENT_METRIC_OTHER);
+                        reportingMessages.add(ReportingMessage.fromEvent(this, mpEvent));
+                    }
+                }
                 break;
         }
 
@@ -291,10 +314,11 @@ public class ResponsysKit extends KitIntegration implements KitIntegration.PushL
     }
 
     private String getUserId(Map<MParticle.IdentityType, String> identities) {
-        if (identities != null) {
-            return identities.get(Email);
+        String userId = null;
+        if (identities != null && identities.containsKey(CustomerId)) {
+            userId = identities.get(CustomerId);
         }
-        return null;
+        return userId;
     }
 
     private boolean isResponsysPush(Intent intent) {
