@@ -1,8 +1,8 @@
-## Example Kit Integration
+## CleverTap Kit Integration
 
 [See here for more information](https://github.com/mParticle/mparticle-android-sdk/wiki/Kit-Development) on how to use this example to write a new kit.
 
-This repository contains the [Example](https://www.example.com/) integration for the [mParticle Android SDK](https://github.com/mParticle/mparticle-android-sdk).
+This repository contains the [CleverTap](https://www.clevertap.com/) integration for the [mParticle Android SDK](https://github.com/mParticle/mparticle-android-sdk).
 
 ### Adding the integration
 
