@@ -25,7 +25,7 @@ import java.util.Map;
  *  - ./src/main/AndroidManifest.xml
  *  - ./consumer-proguard.pro
  */
-public class ExampleKit extends KitIntegration {
+public class CleverTapKit extends KitIntegration {
 
     @Override
     protected List<ReportingMessage> onKitCreate(Map<String, String> settings, Context context) {
@@ -43,8 +43,7 @@ public class ExampleKit extends KitIntegration {
 
     @Override
     public String getName() {
-        //TODO: Replace this with your company name
-        return "Example";
+        return "CleverTap";
     }
 
 
