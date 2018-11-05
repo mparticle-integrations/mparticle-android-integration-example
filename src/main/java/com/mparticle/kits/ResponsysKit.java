@@ -189,7 +189,7 @@ public class ResponsysKit extends KitIntegration implements KitIntegration.PushL
         }
 
         List<ReportingMessage> reportingMessages = processCustomFlags(mpEvent);
-
+        
         final MParticle.EventType eventType = mpEvent.getEventType();
 
         PIOLogger.v("RK lE event type: " + eventType);
