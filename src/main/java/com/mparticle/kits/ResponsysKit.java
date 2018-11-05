@@ -6,7 +6,6 @@ import android.support.v4.app.JobIntentService;
 
 import com.mparticle.MPEvent;
 import com.mparticle.MParticle;
-import com.mparticle.MParticle.EventType;
 import com.mparticle.commerce.CommerceEvent;
 import com.mparticle.commerce.Product;
 import com.mparticle.identity.MParticleUser;
@@ -23,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 import static com.mparticle.MParticle.IdentityType.CustomerId;
 
 public class ResponsysKit extends KitIntegration implements KitIntegration.PushListener,
@@ -31,10 +31,7 @@ public class ResponsysKit extends KitIntegration implements KitIntegration.PushL
         KitIntegration.IdentityListener {
 
     public static final String CUSTOM_FLAG_IAM = "Responsys.Custom.iam";
-    public static final String ENGAGEMENT_METRIC_PREMIUM_CONTENT =  "ResponsysEngagementTypePremium";
-    public static final String ENGAGEMENT_METRIC_INAPP_PURCHASE = "ResponsysEngagementTypePurchase";
-    public static final String ENGAGEMENT_METRIC_OTHER = "ResponsysEngagementTypeOther";
-    public static final String ENGAGEMENT_METRIC_SOCIAL = "ResponsysEngagementTypeSocial";
+    public static final String CUSTOM_FLAG_ENGAGEMENT = "Responsys.Custom.e";
 
     private PushIOManager mPushIOManager;
 
@@ -149,10 +146,16 @@ public class ResponsysKit extends KitIntegration implements KitIntegration.PushL
                 eventProperties.put("Pid", product.getSku());
                 eventProperties.put("Pc", product.getCategory());
 
+                Map<String, String> customProperties = commerceEvent.getCustomAttributes();
+                if(customProperties != null) {
+                    eventProperties.putAll(customProperties);
+                }
+
                 mPushIOManager.trackEvent(responsysEvent, eventProperties);
 
                 if (productAction.equalsIgnoreCase(Product.PURCHASE)) {
-                    mPushIOManager.trackEngagement(PushIOManager.PUSHIO_ENGAGEMENT_METRIC_PURCHASE);
+                    mPushIOManager.trackEngagement(PushIOManager.PUSHIO_ENGAGEMENT_METRIC_PURCHASE,
+                            customProperties, null);
                 }
             }
 
@@ -185,17 +188,9 @@ public class ResponsysKit extends KitIntegration implements KitIntegration.PushL
             return null;
         }
 
-        List<ReportingMessage> reportingMessages = new ArrayList<>();
+        List<ReportingMessage> reportingMessages = processCustomFlags(mpEvent);
 
-        final Map<String, List<String>> customFlags = mpEvent.getCustomFlags();
-        if (customFlags != null && customFlags.containsKey(CUSTOM_FLAG_IAM)) {
-            mPushIOManager.trackEvent(mpEvent.getEventName());
-            reportingMessages.add(ReportingMessage.fromEvent(this, mpEvent));
-            return reportingMessages;
-        }
-
-        final EventType eventType = mpEvent.getEventType();
-        final String eventName = mpEvent.getEventName();
+        final MParticle.EventType eventType = mpEvent.getEventType();
 
         PIOLogger.v("RK lE event type: " + eventType);
 
@@ -203,14 +198,6 @@ public class ResponsysKit extends KitIntegration implements KitIntegration.PushL
             case Search:
                 mPushIOManager.trackEvent("$Searched");
                 reportingMessages.add(ReportingMessage.fromEvent(this, mpEvent));
-                break;
-            case Social:
-                if(!KitUtils.isEmpty(eventName)) {
-                    if(eventName.equalsIgnoreCase(ENGAGEMENT_METRIC_SOCIAL)) {
-                        mPushIOManager.trackEngagement(PushIOManager.PUSHIO_ENGAGEMENT_METRIC_SOCIAL);
-                        reportingMessages.add(ReportingMessage.fromEvent(this, mpEvent));
-                    }
-                }
                 break;
             case UserPreference:
                 Map<String, String> eventInfo = mpEvent.getInfo();
@@ -220,27 +207,8 @@ public class ResponsysKit extends KitIntegration implements KitIntegration.PushL
                             mPushIOManager.declarePreference(entry.getKey(), entry.getKey(), PushIOPreference.Type.STRING);
                             mPushIOManager.setPreference(entry.getKey(), entry.getValue());
                         } catch (ValidationException e) {
-                            PIOLogger.v("RK lE ValidationException: " + e.getMessage());
+                            PIOLogger.v("RK lE Invalid preference: " + e.getMessage());
                         }
-                    }
-                }
-                break;
-            case Transaction:
-                if(!KitUtils.isEmpty(eventName)) {
-                    if(eventName.equalsIgnoreCase(ENGAGEMENT_METRIC_INAPP_PURCHASE)) {
-                        mPushIOManager.trackEngagement(PushIOManager.PUSHIO_ENGAGEMENT_METRIC_INAPP_PURCHASE);
-                        reportingMessages.add(ReportingMessage.fromEvent(this, mpEvent));
-                    }else if(eventName.equalsIgnoreCase(ENGAGEMENT_METRIC_PREMIUM_CONTENT)){
-                        mPushIOManager.trackEngagement(PushIOManager.PUSHIO_ENGAGEMENT_METRIC_PREMIUM_CONTENT);
-                        reportingMessages.add(ReportingMessage.fromEvent(this, mpEvent));
-                    }
-                }
-                break;
-            case Other:
-                if(!KitUtils.isEmpty(eventName)) {
-                    if (eventName.equalsIgnoreCase(ENGAGEMENT_METRIC_OTHER)) {
-                        mPushIOManager.trackEngagement(PushIOManager.PUSHIO_ENGAGEMENT_METRIC_OTHER);
-                        reportingMessages.add(ReportingMessage.fromEvent(this, mpEvent));
                     }
                 }
                 break;
@@ -324,5 +292,34 @@ public class ResponsysKit extends KitIntegration implements KitIntegration.PushL
     private boolean isResponsysPush(Intent intent) {
         return (intent != null && intent.hasExtra("ei") &&
                 !KitUtils.isEmpty(intent.getStringExtra("ei")));
+    }
+
+    private List<ReportingMessage> processCustomFlags(MPEvent mpEvent){
+        List<ReportingMessage> reportingMessages = new ArrayList<>();
+
+        Map<String, List<String>> customFlags = mpEvent.getCustomFlags();
+        if (customFlags != null) {
+            if (customFlags.containsKey(CUSTOM_FLAG_IAM)) {
+                mPushIOManager.trackEvent(mpEvent.getEventName());
+                reportingMessages.add(ReportingMessage.fromEvent(this, mpEvent));
+            }
+
+            if (customFlags.containsKey(CUSTOM_FLAG_ENGAGEMENT)) {
+                List<String> values = customFlags.get(CUSTOM_FLAG_ENGAGEMENT);
+                if (values != null && !values.isEmpty()) {
+                    final String engagementType = values.get(0);
+                    try {
+                        mPushIOManager.trackEngagement(Integer.parseInt(engagementType));
+                        reportingMessages.add(ReportingMessage.fromEvent(this, mpEvent));
+                    }catch(NumberFormatException e){
+                        PIOLogger.e("Invalid engagement type");
+                        PIOLogger.e("Supported engagement types can be accessed from PushIOManager and are of type: " +
+                                "PushIOManager.PUSHIO_ENGAGEMENT_METRIC_***");
+                    }
+                }
+            }
+        }
+
+        return reportingMessages;
     }
 }
