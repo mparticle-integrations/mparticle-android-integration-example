@@ -18,6 +18,8 @@ repositories {
     }
 }
 
+project.version = '5.6.4'
+
 apply plugin: 'com.mparticle.kit'
 
 android {
