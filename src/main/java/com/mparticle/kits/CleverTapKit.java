@@ -28,9 +28,9 @@ public class CleverTapKit extends KitIntegration implements KitIntegration.Attri
 
     private CleverTapAPI cl = null;
     private static final String CLEVERTAP_KEY = "CleverTap";
-    private static final String ACCOUNT_ID_KEY = "clevertap_account_id";
-    private static final String ACCOUNT_TOKEN_KEY = "clevertap_account_token";
-    private static final String ACCOUNT_REGION_KEY = "region";
+    private static final String ACCOUNT_ID_KEY = "AccountID";
+    private static final String ACCOUNT_TOKEN_KEY = "AccountToken";
+    private static final String ACCOUNT_REGION_KEY = "Region";
     private static final String PUSH_ENABLED = "push_enabled";
     private static final String PREF_KEY_HAS_SYNCED_ATTRIBUTES = "clevertap::has_synced_attributes";
 
