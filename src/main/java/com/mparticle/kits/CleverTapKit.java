@@ -1,5 +1,6 @@
 package com.mparticle.kits;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.clevertap.android.sdk.ActivityLifecycleCallback;
-import com.clevertap.android.sdk.Application;
 import com.clevertap.android.sdk.CleverTapAPI;
 import com.clevertap.android.sdk.NotificationInfo;
 import com.mparticle.MPEvent;
