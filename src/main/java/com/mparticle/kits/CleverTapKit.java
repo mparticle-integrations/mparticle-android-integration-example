@@ -15,6 +15,7 @@ import java.util.Map;
 import com.clevertap.android.sdk.ActivityLifecycleCallback;
 import com.clevertap.android.sdk.CleverTapAPI;
 import com.clevertap.android.sdk.NotificationInfo;
+import com.clevertap.android.sdk.SyncListener;
 import com.mparticle.MPEvent;
 import com.mparticle.MParticle;
 import com.mparticle.MParticle.UserAttributes;
@@ -23,8 +24,10 @@ import com.mparticle.commerce.Product;
 import com.mparticle.identity.MParticleUser;
 import com.mparticle.internal.Logger;
 
+import org.json.JSONObject;
 
-public class CleverTapKit extends KitIntegration implements KitIntegration.AttributeListener, KitIntegration.CommerceListener, KitIntegration.EventListener, KitIntegration.PushListener, KitIntegration.IdentityListener  {
+
+public class CleverTapKit extends KitIntegration implements SyncListener, KitIntegration.AttributeListener, KitIntegration.CommerceListener, KitIntegration.EventListener, KitIntegration.PushListener, KitIntegration.IdentityListener  {
 
     private CleverTapAPI cl = null;
     private static final String CLEVERTAP_KEY = "CleverTap";
@@ -33,7 +36,17 @@ public class CleverTapKit extends KitIntegration implements KitIntegration.Attri
     private static final String ACCOUNT_REGION_KEY = "Region";
     private static final String PUSH_ENABLED = "push_enabled";
     private static final String PREF_KEY_HAS_SYNCED_ATTRIBUTES = "clevertap::has_synced_attributes";
+    private static final String CLEVERTAPID_INTEGRATION_KEY = "clevertap_id_integration_setting";
 
+    @Override
+    public void profileDataUpdated(JSONObject updates) {
+        // no-op
+    }
+    public void profileDidInitialize(String cleverTapID) {
+        HashMap<String, String> integrationAttributes = new HashMap<String, String>(1);
+        integrationAttributes.put(CLEVERTAPID_INTEGRATION_KEY, cleverTapID);
+        setIntegrationAttributes(integrationAttributes);
+    }
 
     @Override
     protected List<ReportingMessage> onKitCreate(Map<String, String> settings, Context context) {
@@ -51,6 +64,7 @@ public class CleverTapKit extends KitIntegration implements KitIntegration.Attri
         cl = CleverTapAPI.getDefaultInstance(getContext());
 
         ActivityLifecycleCallback.register(((Application) context.getApplicationContext()));
+
         return null;
     }
 
@@ -254,6 +268,7 @@ public class CleverTapKit extends KitIntegration implements KitIntegration.Attri
     @Override
     public boolean onPushRegistration(String instanceId, String senderId) {
         if (Boolean.parseBoolean(getSettings().get(PUSH_ENABLED))) {
+            cl.pushFcmRegistrationId(instanceId, true);
             return true;
         } else {
             return false;
