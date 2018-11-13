@@ -1,1 +1,2 @@
-# TODO: Add rules to exclude your SDK classes from proguard in implementing apps
+# For CleverTap SDK
+-dontwarn com.clevertap.android.sdk.**
