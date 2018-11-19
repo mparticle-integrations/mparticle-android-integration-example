@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -15,38 +16,45 @@ import java.util.Map;
 import com.clevertap.android.sdk.ActivityLifecycleCallback;
 import com.clevertap.android.sdk.CleverTapAPI;
 import com.clevertap.android.sdk.NotificationInfo;
-import com.clevertap.android.sdk.SyncListener;
 import com.mparticle.MPEvent;
 import com.mparticle.MParticle;
 import com.mparticle.MParticle.UserAttributes;
 import com.mparticle.commerce.CommerceEvent;
 import com.mparticle.commerce.Product;
+import com.mparticle.consent.ConsentState;
 import com.mparticle.identity.MParticleUser;
 import com.mparticle.internal.Logger;
+import com.mparticle.internal.MPUtility;
 
-import org.json.JSONObject;
 
-
-public class CleverTapKit extends KitIntegration implements SyncListener, KitIntegration.AttributeListener, KitIntegration.CommerceListener, KitIntegration.EventListener, KitIntegration.PushListener, KitIntegration.IdentityListener  {
+public class CleverTapKit extends KitIntegration implements
+        KitIntegration.UserAttributeListener,
+        KitIntegration.CommerceListener,
+        KitIntegration.EventListener,
+        KitIntegration.PushListener,
+        KitIntegration.IdentityListener  {
 
     private CleverTapAPI cl = null;
     private static final String CLEVERTAP_KEY = "CleverTap";
     private static final String ACCOUNT_ID_KEY = "AccountID";
     private static final String ACCOUNT_TOKEN_KEY = "AccountToken";
     private static final String ACCOUNT_REGION_KEY = "Region";
-    private static final String PUSH_ENABLED = "push_enabled";
     private static final String PREF_KEY_HAS_SYNCED_ATTRIBUTES = "clevertap::has_synced_attributes";
     private static final String CLEVERTAPID_INTEGRATION_KEY = "clevertap_id_integration_setting";
 
-    @Override
-    public void profileDataUpdated(JSONObject updates) {
-        // no-op
-    }
-    public void profileDidInitialize(String cleverTapID) {
-        HashMap<String, String> integrationAttributes = new HashMap<String, String>(1);
-        integrationAttributes.put(CLEVERTAPID_INTEGRATION_KEY, cleverTapID);
-        setIntegrationAttributes(integrationAttributes);
-    }
+    private static final String IDENTITY_EMAIL = "Email";
+    private static final String IDENTITY_FACEBOOK = "FBID";
+    private static final String IDENTITY_GOOGLE = "GPID";
+    private static final String IDENTITY_IDENTITY = "Identity";
+
+    private static final String PHONE = "Phone";
+    private static final String NAME = "Name";
+    private static final String BIRTHDAY = "birthday";
+    private static final String DOB = "DOB";
+    private static final String MALE = "M";
+    private static final String FEMALE = "F";
+
+    private static Handler handler = null;
 
     @Override
     protected List<ReportingMessage> onKitCreate(Map<String, String> settings, Context context) {
@@ -58,16 +66,39 @@ public class CleverTapKit extends KitIntegration implements SyncListener, KitInt
         if (KitUtils.isEmpty(accountToken)) {
             throw new IllegalArgumentException("CleverTap AccountToken is empty.");
         }
-        String region = settings.get(ACCOUNT_REGION_KEY);
-
-        CleverTapAPI.changeCredentials(accountID, accountToken, region);
-        cl = CleverTapAPI.getDefaultInstance(getContext());
 
         ActivityLifecycleCallback.register(((Application) context.getApplicationContext()));
 
+        String region = settings.get(ACCOUNT_REGION_KEY);
+        CleverTapAPI.changeCredentials(accountID, accountToken, region);
+        cl = CleverTapAPI.getDefaultInstance(getContext());
+
+        updateIntegrationAttributes();
         return null;
     }
 
+    /**
+     * Sets the CleverTap Device ID as an mParticle integration attribute.
+     * Need to poll for it as its set asynchronously within the SDK (on initial launch)
+     */
+    private void updateIntegrationAttributes() {
+        String cleverTapID = cl.getCleverTapAttributionIdentifier();
+        if (!KitUtils.isEmpty(cleverTapID)) {
+            HashMap<String, String> integrationAttributes = new HashMap<String, String>(1);
+            integrationAttributes.put(CLEVERTAPID_INTEGRATION_KEY, cleverTapID);
+            this.setIntegrationAttributes(integrationAttributes);
+        } else {
+            if (handler == null) {
+               handler = new Handler();
+            }
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    updateIntegrationAttributes();
+                }
+            }, 500);
+        }
+    }
 
     @Override
     public String getName() {
@@ -76,7 +107,20 @@ public class CleverTapKit extends KitIntegration implements SyncListener, KitInt
 
     @Override
     public List<ReportingMessage> setOptOut(boolean optedOut) {
-        return null;
+        cl.setOptOut(optedOut);
+        List<ReportingMessage> messages = new LinkedList<ReportingMessage>();
+        messages.add(new ReportingMessage(this, ReportingMessage.MessageType.OPT_OUT, System.currentTimeMillis(), null));
+        return messages;
+    }
+
+    @Override
+    public void setLocation(android.location.Location location) {
+        cl.setLocation(location);
+    }
+
+    @Override
+    public void setInstallReferrer(android.content.Intent intent) {
+        cl.pushInstallReferrer(intent);
     }
 
     @Override
@@ -97,8 +141,7 @@ public class CleverTapKit extends KitIntegration implements SyncListener, KitInt
     @Override
     public List<ReportingMessage> logEvent(MPEvent event) {
         Map<String,String> info = event.getInfo();
-        Map<String, Object> props = new HashMap<>();
-        props.putAll(info);
+        Map<String, Object> props = new HashMap<String, Object>(info);
         cl.pushEvent(event.getEventName(),props);
         List<ReportingMessage> messages = new LinkedList<ReportingMessage>();
         messages.add(ReportingMessage.fromEvent(this, event));
@@ -132,17 +175,21 @@ public class CleverTapKit extends KitIntegration implements SyncListener, KitInt
             for (Map.Entry<String, String> entry : eventAttributes.entrySet()) {
                 details.put(entry.getKey(), entry.getValue());
             }
+
+            String transactionId = (event.getTransactionAttributes() != null && !MPUtility.isEmpty(event.getTransactionAttributes().getId())) ? event.getTransactionAttributes().getId(): null;
+            if (transactionId != null) {
+                details.put("Charged ID", transactionId);
+            }
             List<Product> products = event.getProducts();
             for (int i = 0; i < products.size(); i++) {
                 try {
                     Product product = products.get(i);
                     HashMap<String, String> attrs = new HashMap<>();
                     CommerceEventUtils.extractProductFields(product, attrs);
-                    HashMap<String, Object> item = new HashMap<>();
-                    item.putAll(attrs);
+                    HashMap<String, Object> item = new HashMap<String, Object>(attrs);
                     items.add(item);
                 } catch (Throwable t) {
-                    cl.pushError("Error handling Order Completed product: " + t.getMessage(), 512);
+                    cl.pushError("Error handling Commerce Event product: " + t.getMessage(), 512);
                 }
             }
             cl.pushChargedEvent(details, items);
@@ -162,20 +209,48 @@ public class CleverTapKit extends KitIntegration implements SyncListener, KitInt
     }
 
     @Override
-    public void setUserAttribute(String key, String value) {
+    public void onSetUserAttributeList(String attributeKey, List<String> attributeValueList, FilteredMParticleUser user) {
+        cl.setMultiValuesForKey(attributeKey, new ArrayList<String>(attributeValueList));
+    }
+
+    @Override
+    public boolean supportsAttributeLists() {
+        return true;
+    }
+
+    @Override
+    public void onIncrementUserAttribute (String key, String value, FilteredMParticleUser user) {
+        // not supported
+    }
+
+    @Override
+    public void onRemoveUserAttribute(String key, FilteredMParticleUser user) {
+        if (UserAttributes.MOBILE_NUMBER.equals(key)) {
+            key = PHONE;
+        } else {
+            if (key.startsWith("$")) {
+                key = key.substring(1);
+            }
+        }
+        cl.removeValueForKey(key);
+    }
+
+    @Override
+    public void onSetUserAttribute(String key, Object value, FilteredMParticleUser user) {
         HashMap<String, Object> profile = new HashMap<>();
-        if ("birthday".equals(key)) {
-            key = "DOB";
+        if (BIRTHDAY.equals(key)) {
+            key = DOB;
         } else if ("name".equals(key)) {
-            key = "Name";
+            key = NAME;
         } else if (UserAttributes.GENDER.equals(key)) {
-            if (value.contains("fe")) {
-                value = "F";
+            String _value = (String) value;
+            if (_value.contains("fe")) {
+                value = FEMALE;
             } else {
-                value = "M";
+                value = MALE;
             }
         } else if (UserAttributes.MOBILE_NUMBER.equals(key)) {
-            key = "Phone";
+            key = PHONE;
         } else {
             if (key.startsWith("$")) {
                 key = key.substring(1);
@@ -186,66 +261,37 @@ public class CleverTapKit extends KitIntegration implements SyncListener, KitInt
     }
 
     @Override
-    public void setUserAttributeList(String key, List<String> list) {
-        cl.setMultiValuesForKey(key, new ArrayList(list));
+    public void onSetUserTag(String key, FilteredMParticleUser user) {
+        // not supported
     }
 
     @Override
-    public boolean supportsAttributeLists() {
-        return true;
-    }
-
-    /**
-     * This is called when the Kit is added to the mParticle SDK, typically on app-startup.
-     */
-    @Override
-    public void setAllUserAttributes(Map<String, String> attributes, Map<String, List<String>> attributeLists) {
+    public void onSetAllUserAttributes(Map<String, String> userAttributes, Map<String, List<String>> userAttributeLists, FilteredMParticleUser user) {
         if (!getKitPreferences().getBoolean(PREF_KEY_HAS_SYNCED_ATTRIBUTES, false)) {
-            for (Map.Entry<String, String> entry : attributes.entrySet()) {
-                setUserAttribute(entry.getKey(), entry.getValue());
+            for (Map.Entry<String, String> entry : userAttributes.entrySet()) {
+                onSetUserAttribute(entry.getKey(), entry.getValue(), user);
             }
-            for (Map.Entry<String, List<String>> entry : attributeLists.entrySet()) {
-                setUserAttributeList(entry.getKey(), entry.getValue());
+            for (Map.Entry<String, List<String>> entry : userAttributeLists.entrySet()) {
+                onSetUserAttributeList(entry.getKey(), entry.getValue(), user);
             }
             getKitPreferences().edit().putBoolean(PREF_KEY_HAS_SYNCED_ATTRIBUTES, true).apply();
         }
     }
 
     @Override
-    public void removeUserAttribute(String key) {
-        if (UserAttributes.MOBILE_NUMBER.equals(key)) {
-            key = "Phone";
-        } else {
-            if (key.startsWith("$")) {
-                key = key.substring(1);
-            }
-        }
-        cl.removeValueForKey(key);
-    }
-
-    @Override
-    public void setUserIdentity(MParticle.IdentityType identityType, String identity) {
-        // no-op
-    }
-
-    @Override
-    public void removeUserIdentity(MParticle.IdentityType identityType) {
-        // no-op
-    }
-
-    @Override
-    public List<ReportingMessage> logout() {
-        return null;
+    public void onConsentStateUpdated(ConsentState oldState, ConsentState newState, FilteredMParticleUser user) {
+        // not supported
     }
 
     @Override
     public List<ReportingMessage> logLtvIncrease(BigDecimal valueIncreased, BigDecimal valueTotal, String eventName, Map<String, String> contextInfo) {
+        // not supported
         return null;
     }
 
     @Override
     public boolean willHandlePushMessage(Intent intent) {
-        if (!Boolean.parseBoolean(getSettings().get(PUSH_ENABLED))) {
+        if (intent == null || intent.getExtras() == null) {
             return false;
         }
         NotificationInfo info = CleverTapAPI.getNotificationInfo(intent.getExtras());
@@ -254,30 +300,25 @@ public class CleverTapKit extends KitIntegration implements SyncListener, KitInt
 
     @Override
     public void onPushMessageReceived(Context context, Intent pushIntent) {
-        if (Boolean.parseBoolean(getSettings().get(PUSH_ENABLED))) {
-            Bundle extras = pushIntent.getExtras();
-            if (extras != null) {
-                NotificationInfo info = CleverTapAPI.getNotificationInfo(extras);
-                if (info.fromCleverTap) {
-                    CleverTapAPI.createNotification(getContext(), extras);
-                }
-            }
+        if (pushIntent == null || pushIntent.getExtras() == null) {
+            return;
+        }
+        Bundle extras = pushIntent.getExtras();
+        NotificationInfo info = CleverTapAPI.getNotificationInfo(extras);
+        if (info.fromCleverTap) {
+            CleverTapAPI.createNotification(getContext(), extras);
         }
     }
 
     @Override
     public boolean onPushRegistration(String instanceId, String senderId) {
-        if (Boolean.parseBoolean(getSettings().get(PUSH_ENABLED))) {
-            cl.pushFcmRegistrationId(instanceId, true);
-            return true;
-        } else {
-            return false;
-        }
+        cl.pushFcmRegistrationId(instanceId, true);
+        return true;
     }
 
     @Override
     public void onUserIdentified(MParticleUser mParticleUser) {
-        // no-op
+        // not used
     }
 
     @Override
@@ -292,7 +333,7 @@ public class CleverTapKit extends KitIntegration implements SyncListener, KitInt
 
     @Override
     public void onLogoutCompleted(MParticleUser mParticleUser, FilteredIdentityApiRequest filteredIdentityApiRequest) {
-        // no-op
+        // not used
     }
 
     @Override
@@ -308,16 +349,16 @@ public class CleverTapKit extends KitIntegration implements SyncListener, KitInt
         String gpid = mParticleUser.getUserIdentities().get(MParticle.IdentityType.Google);
 
         if (customerId != null) {
-            profile.put("Identity", customerId);
+            profile.put(IDENTITY_IDENTITY, customerId);
         }
         if (email != null) {
-            profile.put("Email", email);
+            profile.put(IDENTITY_EMAIL, email);
         }
         if (fbid != null) {
-            profile.put("FBID", email);
+            profile.put(IDENTITY_FACEBOOK, email);
         }
         if (gpid != null) {
-            profile.put("GPID", email);
+            profile.put(IDENTITY_GOOGLE, email);
         }
 
         if (profile.isEmpty()) {
