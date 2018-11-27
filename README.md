@@ -18,7 +18,7 @@ This repository contains the [Example](https://www.example.com/) integration for
 
 ### Documentation
 
-[Example integration](http://docs.mparticle.com/?java#REPLACEME)
+[Example integration](https://docs.mparticle.com/developers/partners/kit-integrations/android-kit/)
 
 ### License
 
