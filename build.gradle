@@ -29,7 +29,7 @@ android {
 }
 
 dependencies {
-    api 'com.clevertap.android:clevertap-android-sdk:3.3.2'
+    api 'com.clevertap.android:clevertap-android-sdk:3.3.4'
     
 }
 

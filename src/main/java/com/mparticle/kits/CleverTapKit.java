@@ -67,10 +67,11 @@ public class CleverTapKit extends KitIntegration implements
             throw new IllegalArgumentException("CleverTap AccountToken is empty.");
         }
 
-        ActivityLifecycleCallback.register(((Application) context.getApplicationContext()));
-
         String region = settings.get(ACCOUNT_REGION_KEY);
         CleverTapAPI.changeCredentials(accountID, accountToken, region);
+
+        ActivityLifecycleCallback.register(((Application) context.getApplicationContext()));
+
         cl = CleverTapAPI.getDefaultInstance(getContext());
 
         updateIntegrationAttributes();
