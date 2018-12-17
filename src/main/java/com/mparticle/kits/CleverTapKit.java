@@ -359,7 +359,7 @@ public class CleverTapKit extends KitIntegration implements
              profile.put(IDENTITY_FACEBOOK, fbid);
         }
         if (gpid != null) {
-            profile.put(IDENTITY_GOOGLE, email);
+             profile.put(IDENTITY_GOOGLE, gpid);
         }
 
         if (profile.isEmpty()) {
