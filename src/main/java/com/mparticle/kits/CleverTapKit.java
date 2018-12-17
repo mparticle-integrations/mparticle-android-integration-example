@@ -305,10 +305,7 @@ public class CleverTapKit extends KitIntegration implements
             return;
         }
         Bundle extras = pushIntent.getExtras();
-        NotificationInfo info = CleverTapAPI.getNotificationInfo(extras);
-        if (info.fromCleverTap) {
-            CleverTapAPI.createNotification(getContext(), extras);
-        }
+        CleverTapAPI.createNotification(getContext(), extras);
     }
 
     @Override
