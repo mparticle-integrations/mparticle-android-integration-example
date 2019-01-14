@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">PilgrimSDK mParticle</string>
+    <string name="mParticle_apiKey"></string>
+    <string name="mParticle_apiSecret"></string>
+</resources>

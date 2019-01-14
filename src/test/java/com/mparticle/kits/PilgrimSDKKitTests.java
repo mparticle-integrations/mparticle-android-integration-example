@@ -13,10 +13,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class KitTests {
+public class PilgrimSDKKitTests {
 
     private KitIntegration getKit() {
-        return new ExampleKit();
+        return new PilgrimSDKKit();
     }
 
     @Test
