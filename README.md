@@ -1,6 +1,6 @@
 ## PilgrimSDK Kit Integration
 
-This repository contains the [PilgrimSDK](https://enterprise.foursquare.com/products/pilgrim) integration for [mParticle Android SDK](https://github.com/mParticle/mparticle-android-sdk).
+This repository contains the [PilgrimSDK](https://developer.foursquare.com/docs/pilgrim-sdk/quickstart#android) integration for [mParticle Android SDK](https://github.com/mParticle/mparticle-android-sdk).
 
 ## Example App
 This repository contains an [Example App](https://github.com/foursquare/mparticle-android-integration-example/tree/feature/pilgrim-sdk-integration/example) showing how to implement mParticle and PilgrimSDK

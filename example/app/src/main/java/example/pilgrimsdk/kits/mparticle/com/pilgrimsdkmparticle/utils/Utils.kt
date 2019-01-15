@@ -5,9 +5,9 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.support.v4.content.ContextCompat
 
-fun isLocationPermissionGranted(ctx: Context): Boolean {
+fun Context.isLocationPermissionGranted(): Boolean {
     return ContextCompat.checkSelfPermission(
-        ctx,
+        this,
         Manifest.permission.ACCESS_FINE_LOCATION
     ) == PackageManager.PERMISSION_GRANTED
 }

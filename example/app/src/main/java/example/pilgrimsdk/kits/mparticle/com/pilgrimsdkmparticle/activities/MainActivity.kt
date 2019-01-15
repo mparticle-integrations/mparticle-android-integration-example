@@ -1,4 +1,4 @@
-package example.pilgrimsdk.kits.mparticle.com.pilgrimsdkmparticle
+package example.pilgrimsdk.kits.mparticle.com.pilgrimsdkmparticle.activities
 
 import android.Manifest
 import android.app.Activity
@@ -12,6 +12,7 @@ import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import com.foursquare.pilgrimsdk.debugging.PilgrimSdkDebugActivity
 import com.mparticle.MParticle
+import example.pilgrimsdk.kits.mparticle.com.pilgrimsdkmparticle.R
 import example.pilgrimsdk.kits.mparticle.com.pilgrimsdkmparticle.utils.isLocationPermissionGranted
 
 class MainActivity : AppCompatActivity() {
@@ -19,7 +20,8 @@ class MainActivity : AppCompatActivity() {
     @Suppress("PrivatePropertyName")
     private val EXAMPLE_REQUEST_LOCATION = 16
 
-    private val receiver = Receiver(this)
+    private val receiver =
+        Receiver(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +37,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkLocationPermission(activity: Activity): Boolean {
-        if (!isLocationPermissionGranted(activity)) {
+        if (!activity.isLocationPermissionGranted()) {
             // Request fine location permission
             val pem = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
             ActivityCompat.requestPermissions(activity, pem, EXAMPLE_REQUEST_LOCATION)
@@ -74,7 +76,7 @@ class MainActivity : AppCompatActivity() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action!!.startsWith(MParticle.ServiceProviders.BROADCAST_ACTIVE)) {
                 //make a direct PilgrimSDK API call, or set a boolean field that you can check elsewhere
-                if (isLocationPermissionGranted(context)) {
+                if (context.isLocationPermissionGranted()) {
                     act.navigateToDebugActivity()
                 } else {
                     // Ask for permission location
@@ -85,6 +87,4 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-
 }
