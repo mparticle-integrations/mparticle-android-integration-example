@@ -1,25 +1,29 @@
 ## PilgrimSDK Kit Integration
 
-[See here for more information](https://github.com/mParticle/mparticle-android-sdk/wiki/Kit-Development) on how to use this example to write a new kit.
+This repository contains the [PilgrimSDK](https://enterprise.foursquare.com/products/pilgrim) integration for [mParticle Android SDK](https://github.com/mParticle/mparticle-android-sdk).
 
-This repository contains the [PilgrimSDK](https://enterprise.foursquare.com/products/pilgrim) integration for the [mParticle Android SDK](https://github.com/mParticle/mparticle-android-sdk).
+## Example App
+This repository contains an [Example App](https://github.com/foursquare/mparticle-android-integration-example/tree/feature/pilgrim-sdk-integration/example) showing how to implement mParticle and PilgrimSDK
 
 ### Adding the integration
 
 1. Add the kit dependency to your app's build.gradle:
+    [See a full build.gradle example here](https://github.com/foursquare/mparticle-android-integration-example/blob/feature/pilgrim-sdk-integration/example/build.gradle)
 
     ```groovy
     dependencies {
         api 'com.mparticle:android-pilgrimsdk-kit:5+'
-        implementation ''
     }
     ```
+
+
 2. Follow the mParticle Android SDK [quick-start](https://github.com/mParticle/mparticle-android-sdk), then rebuild and launch your app, and verify that you see `"PilgrimSDKKit detected"` in the output of `adb logcat`.
+
 3. Reference mParticle's integration docs below to enable the integration.
 
 ### Documentation
 
-[PilgrimSDK integration](http://docs.mparticle.com/?java#REPLACEME)
+[PilgrimSDK](https://developer.foursquare.com/docs/pilgrim-sdk/quickstart#android)
 
 ### License
 
