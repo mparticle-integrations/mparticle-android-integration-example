@@ -165,11 +165,9 @@ final public class PilgrimSDKKit extends KitIntegration implements KitIntegratio
 
     private void updateUser(MParticleUser mParticleUser) {
         PilgrimUserInfo info = getUserInfo();
-        String customerId = mParticleUser.getUserIdentities().get(MParticle.IdentityType.CustomerId);
-        if (customerId != null) {
-            // only update if it's not null
-            info.setUserId(customerId);
-        }
+        String customerId = mParticleUser.getId() + "";
+        // only update if it's not null
+        info.setUserId(customerId);
         PilgrimSdk.get().setUserInfo(info);
     }
 
