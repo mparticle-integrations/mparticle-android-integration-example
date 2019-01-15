@@ -58,8 +58,6 @@ final public class PilgrimSDKKit extends KitIntegration implements KitIntegratio
 
         // Configure with our starter
         PilgrimSdk.with(builder);
-        // ----
-        PilgrimSdk.start(context);
 
         List<ReportingMessage> messageList = new LinkedList<>();
         // Can we add messages to track if initialized/started successfully in attributes

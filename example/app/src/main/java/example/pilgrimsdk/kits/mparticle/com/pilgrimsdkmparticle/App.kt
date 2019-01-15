@@ -30,11 +30,10 @@ class App : Application() {
             return
         }
     }
-
+    
     private fun getMPOptionsBuilder(key: String, secret: String): MParticleOptions.Builder {
         return MParticleOptions.builder(this)
             .credentials(key, secret)
             .logLevel(MParticle.LogLevel.VERBOSE)
-            .identify(IdentityApiRequest.withEmptyUser().build())
     }
 }
