@@ -40,12 +40,8 @@ final public class PilgrimSDKKit extends KitIntegration implements KitIntegratio
     private static final String PILGRIM_SDK_SECRET = "pilgrim_sdk_secret";
 
 
-    private static final String ALLOW_DEBUG_OUTPUT = "enableDebug";
-
     @Override
     protected List<ReportingMessage> onKitCreate(Map<String, String> settings, Context context) {
-        // We need to try and keep the context reference
-        // for us to try and stop the SDK when requested.
         String key = settings.get(PILGRIM_SDK_KEY);
         if (KitUtils.isEmpty(key)) {
             throw new IllegalArgumentException("PilgrimSDK key is empty.");
@@ -59,10 +55,6 @@ final public class PilgrimSDKKit extends KitIntegration implements KitIntegratio
         PilgrimSdk.Builder builder = new PilgrimSdk.Builder(context)
                 .consumer(key, secret)
                 .logLevel(LogLevel.ERROR);
-
-        if (KitUtils.parseBooleanSetting(settings, ALLOW_DEBUG_OUTPUT, false)) {
-            builder.enableDebugLogs();
-        }
 
         // Configure with our starter
         PilgrimSdk.with(builder);
