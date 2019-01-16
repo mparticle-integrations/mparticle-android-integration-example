@@ -14,20 +14,20 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This is the PilgrimSDK mParticle kit , used to extend the functionality of mParticle SDK and allow control of
- * the PilgimSDK; Mapping analogous public mParticle APIs into PilgrimSDK's API.
+ * This is the PilgrimSdk mParticle kit , used to extend the functionality of mParticle SDK and allow control of
+ * the PilgimSdk; Mapping analogous public mParticle APIs into PilgrimSdk's API.
  * <p>
  * <p>
  * In addition to this file, you also will need to edit:
  * - ./build.gradle (as explained above)
  * - ./README.md
  */
-final public class PilgrimSDKKit extends KitIntegration implements KitIntegration.UserAttributeListener, KitIntegration.IdentityListener {
+final public class PilgrimSdkKit extends KitIntegration implements KitIntegration.UserAttributeListener, KitIntegration.IdentityListener {
 
     /**
      * Name of the kit
      */
-    private static final String KIT_NAME = "PilgrimSDKKit";
+    private static final String KIT_NAME = "PilgrimSdkKit";
 
     /**
      * Key used to get the api key from mParticle's settings response
@@ -44,12 +44,12 @@ final public class PilgrimSDKKit extends KitIntegration implements KitIntegratio
     protected List<ReportingMessage> onKitCreate(Map<String, String> settings, Context context) {
         String key = settings.get(PILGRIM_SDK_KEY);
         if (KitUtils.isEmpty(key)) {
-            throw new IllegalArgumentException("PilgrimSDK key is empty.");
+            throw new IllegalArgumentException("PilgrimSdk key is empty.");
         }
 
         String secret = settings.get(PILGRIM_SDK_SECRET);
         if (KitUtils.isEmpty(secret)) {
-            throw new IllegalArgumentException("PilgrimSDK secret is empty.");
+            throw new IllegalArgumentException("PilgrimSdk secret is empty.");
         }
 
         PilgrimSdk.Builder builder = new PilgrimSdk.Builder(context)
@@ -165,7 +165,7 @@ final public class PilgrimSDKKit extends KitIntegration implements KitIntegratio
 
     private void updateUser(MParticleUser mParticleUser) {
         PilgrimUserInfo info = getUserInfo();
-        String customerId = mParticleUser.getId() + "";
+        String customerId = String.valueOf(mParticleUser.getId());
         // only update if it's not null
         info.setUserId(customerId);
         PilgrimSdk.get().setUserInfo(info);

@@ -13,7 +13,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class PilgrimSDKKitTests {
+public class PilgrimSdkKitTests {
 
     private KitIntegration getKit() {
         return new PilgrimSDKKit();
