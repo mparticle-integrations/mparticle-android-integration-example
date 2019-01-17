@@ -11,7 +11,6 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import com.foursquare.pilgrim.PilgrimSdk
-import com.foursquare.pilgrim.PilgrimUserInfo
 import com.foursquare.pilgrimsdk.debugging.PilgrimSdkDebugActivity
 import com.mparticle.MParticle
 import example.pilgrimsdk.kits.mparticle.com.pilgrimsdkmparticle.R
@@ -79,6 +78,10 @@ class MainActivity : AppCompatActivity() {
             if (intent.action!!.startsWith(MParticle.ServiceProviders.BROADCAST_ACTIVE)) {
                 //make a direct PilgrimSDK API call, or set a boolean field that you can check elsewhere
                 if (context.isLocationPermissionGranted()) {
+                    // NOTE: If you're setting persisteng logging off in mParticle's dashboard
+                    // please uncomment this, so you can see stuff happening in the next activity
+                    // PilgrimSdk.get().setEnablePersistentLogs(true)
+
                     // Start the configured PilgriSdk instance
                     PilgrimSdk.start(act.applicationContext)
                     // and navigate to the debug app
