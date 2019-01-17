@@ -5,7 +5,6 @@ import android.content.Context;
 import com.foursquare.pilgrim.LogLevel;
 import com.foursquare.pilgrim.PilgrimSdk;
 import com.foursquare.pilgrim.PilgrimUserInfo;
-import com.mparticle.MParticle;
 import com.mparticle.consent.ConsentState;
 import com.mparticle.identity.MParticleUser;
 
@@ -30,31 +29,40 @@ final public class PilgrimSdkKit extends KitIntegration implements KitIntegratio
     private static final String KIT_NAME = "PilgrimSdkKit";
 
     /**
-     * Key used to get the api key from mParticle's settings response
+     * Key used to get the Pilgrim Sdk api key from mParticle's settings response
      */
-    private static final String PILGRIM_SDK_KEY = "pilgrim_sdk_key";
+    static final String SDK_KEY = "pilgrim_sdk_key";
 
     /**
-     * Key used to get the secret from mParticle's settings response
+     * Key used to get the Pilgrim Sdk secret from mParticle's settings response
      */
-    private static final String PILGRIM_SDK_SECRET = "pilgrim_sdk_secret";
+    static final String SDK_SECRET = "pilgrim_sdk_secret";
+
+    /**
+     * Key used to get the Pilgrim Sdk enable  configuration enabling flag from mParticle's settings response
+     */
+    private static final String SDK_ENABLE_PERSISTENT_LOGS = "pilgrim_persistent_logs";
 
 
     @Override
     protected List<ReportingMessage> onKitCreate(Map<String, String> settings, Context context) {
-        String key = settings.get(PILGRIM_SDK_KEY);
+        String key = settings.get(SDK_KEY);
         if (KitUtils.isEmpty(key)) {
             throw new IllegalArgumentException("PilgrimSdk key is empty.");
         }
 
-        String secret = settings.get(PILGRIM_SDK_SECRET);
+        String secret = settings.get(SDK_SECRET);
         if (KitUtils.isEmpty(secret)) {
             throw new IllegalArgumentException("PilgrimSdk secret is empty.");
         }
 
         PilgrimSdk.Builder builder = new PilgrimSdk.Builder(context)
                 .consumer(key, secret)
-                .logLevel(LogLevel.ERROR);
+                .logLevel(LogLevel.DEBUG);
+
+        if (KitUtils.parseBooleanSetting(settings, SDK_ENABLE_PERSISTENT_LOGS, false)) {
+            builder.enableDebugLogs();
+        }
 
         // Configure with our starter
         PilgrimSdk.with(builder);
