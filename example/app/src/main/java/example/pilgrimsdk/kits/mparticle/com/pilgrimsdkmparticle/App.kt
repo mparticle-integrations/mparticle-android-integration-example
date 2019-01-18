@@ -5,8 +5,6 @@ import android.content.res.Resources
 import android.util.Log
 import com.mparticle.MParticle
 import com.mparticle.MParticleOptions
-import com.mparticle.identity.IdentityApiRequest
-
 
 @Suppress("unused")
 class App : Application() {

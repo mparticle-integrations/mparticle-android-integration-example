@@ -31,6 +31,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     // MParticle PilgrimSDK kit integration
-    api 'com.mparticle:android-pilgrimsdk-kit:5.7.3'
+    api 'com.mparticle:android-pilgrimsdk-kit:5.7.5'
     implementation 'com.foursquare:pilgrimsdk-debugging:2.1.0'
 }

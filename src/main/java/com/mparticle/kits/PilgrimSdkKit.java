@@ -5,6 +5,7 @@ import android.content.Context;
 import com.foursquare.pilgrim.LogLevel;
 import com.foursquare.pilgrim.PilgrimSdk;
 import com.foursquare.pilgrim.PilgrimUserInfo;
+import com.mparticle.MParticle;
 import com.mparticle.consent.ConsentState;
 import com.mparticle.identity.MParticleUser;
 
@@ -182,7 +183,7 @@ final public class PilgrimSdkKit extends KitIntegration implements KitIntegratio
             // only update if it's not null
             info.setUserId(customerId);
         }
-        info.put(MPARTILE_USER_ID , mParticleUserId)
+        info.put(MPARTILE_USER_ID , mParticleUserId);
         PilgrimSdk.get().setUserInfo(info);
     }
 
