@@ -43,6 +43,8 @@ final public class PilgrimSdkKit extends KitIntegration implements KitIntegratio
      */
     private static final String SDK_ENABLE_PERSISTENT_LOGS = "pilgrim_persistent_logs";
 
+    private static final String MPARTILE_USER_ID = "mParticleUserId";
+
 
     @Override
     protected List<ReportingMessage> onKitCreate(Map<String, String> settings, Context context) {
@@ -173,9 +175,14 @@ final public class PilgrimSdkKit extends KitIntegration implements KitIntegratio
 
     private void updateUser(MParticleUser mParticleUser) {
         PilgrimUserInfo info = getUserInfo();
-        String customerId = String.valueOf(mParticleUser.getId());
+        String mParticleUserId = String.valueOf(mParticleUser.getId());
         // only update if it's not null
-        info.setUserId(customerId);
+        String customerId = mParticleUser.getUserIdentities().get(MParticle.IdentityType.CustomerId);
+        if (customerId != null) {
+            // only update if it's not null
+            info.setUserId(customerId);
+        }
+        info.put(MPARTILE_USER_ID , mParticleUserId)
         PilgrimSdk.get().setUserInfo(info);
     }
 
