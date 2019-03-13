@@ -10,7 +10,7 @@ This repository contains the [Example](https://www.example.com/) integration for
 
     ```groovy
     dependencies {
-        compile 'com.mparticle:android-example-kit:5+'
+        compile 'com.mparticle:android-onetrust-kit:5+'
     }
     ```
 2. Follow the mParticle Android SDK [quick-start](https://github.com/mParticle/mparticle-android-sdk), then rebuild and launch your app, and verify that you see `"<REPLACE ME> detected"` in the output of `adb logcat`.
