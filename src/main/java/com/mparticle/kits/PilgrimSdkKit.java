@@ -119,9 +119,8 @@ final public class PilgrimSdkKit extends KitIntegration implements KitIntegratio
         PilgrimSdk.get().setUserInfo(info);
     }
 
-
     @Override
-    public void onIncrementUserAttribute(String s, String s1, FilteredMParticleUser filteredMParticleUser) {
+    public void onIncrementUserAttribute(String s, int i, String s1, FilteredMParticleUser filteredMParticleUser) {
         // Ignored,  Not supported atm
     }
 
