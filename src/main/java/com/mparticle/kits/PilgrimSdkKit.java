@@ -9,6 +9,7 @@ import com.mparticle.MParticle;
 import com.mparticle.consent.ConsentState;
 import com.mparticle.identity.MParticleUser;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -83,10 +84,13 @@ final public class PilgrimSdkKit extends KitIntegration implements KitIntegratio
 
     @Override
     public List<ReportingMessage> setOptOut(boolean optedOut) {
-        List<ReportingMessage> messageList = new LinkedList<>();
-        PilgrimSdk.stop(getContext());
-        messageList.add(new ReportingMessage(this, ReportingMessage.MessageType.OPT_OUT, System.currentTimeMillis(), null));
-        return messageList;
+        if (optedOut) {
+            List<ReportingMessage> messageList = new LinkedList<>();
+            PilgrimSdk.stop(getContext());
+            messageList.add(new ReportingMessage(this, ReportingMessage.MessageType.OPT_OUT, System.currentTimeMillis(), null));
+            return messageList;
+        }
+        return Collections.emptyList();
     }
 
     /**
@@ -107,7 +111,7 @@ final public class PilgrimSdkKit extends KitIntegration implements KitIntegratio
     public void onSetAllUserAttributes(Map<String, String> attributes, Map<String, List<String>> attributeLists, FilteredMParticleUser filteredMParticleUser) {
         // NOTE: attributeList not supported
         // Is this ID correct?
-        updateUser(filteredMParticleUser.mpUser);
+        updateUser(filteredMParticleUser);
         PilgrimUserInfo info = getUserInfo();
         for (Map.Entry<String, String> entry : attributes.entrySet()) {
             info.put(entry.getKey(), entry.getValue());
@@ -124,7 +128,6 @@ final public class PilgrimSdkKit extends KitIntegration implements KitIntegratio
     @Override
     public void onRemoveUserAttribute(String s, FilteredMParticleUser filteredMParticleUser) {
         PilgrimUserInfo info = getUserInfo();
-        // Do we want to log if it doesn't exist?
         info.remove(s);
     }
 
