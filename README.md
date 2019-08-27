@@ -1,8 +1,6 @@
-## Example Kit Integration
+## Swrve Kit Integration
 
-[See here for more information](https://github.com/mParticle/mparticle-android-sdk/wiki/Kit-Development) on how to use this example to write a new kit.
-
-This repository contains the [Example](https://www.example.com/) integration for the [mParticle Android SDK](https://github.com/mParticle/mparticle-android-sdk).
+This repository contains the [Swrve](https://www.swrve.com/) integration for the [mParticle Android SDK](https://github.com/mParticle/mparticle-android-sdk).
 
 ### Adding the integration
 
@@ -10,15 +8,15 @@ This repository contains the [Example](https://www.example.com/) integration for
 
     ```groovy
     dependencies {
-        compile 'com.mparticle:android-example-kit:5+'
+        compile 'com.mparticle:android-swrve-kit:5+'
     }
     ```
-2. Follow the mParticle Android SDK [quick-start](https://github.com/mParticle/mparticle-android-sdk), then rebuild and launch your app, and verify that you see `"<REPLACE ME> detected"` in the output of `adb logcat`.
+2. Follow the mParticle Android SDK [quick-start](https://github.com/mParticle/mparticle-android-sdk), then rebuild and launch your app, and verify that you see `"Swrve detected"` in the output of `adb logcat`.
 3. Reference mParticle's integration docs below to enable the integration.
 
 ### Documentation
 
-[Example integration](http://docs.mparticle.com/?java#REPLACEME)
+[Swrve integration](https://docs.mparticle.com/integrations/swrve/event/)
 
 ### License
 
