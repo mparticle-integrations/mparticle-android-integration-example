@@ -16,7 +16,7 @@ import static org.junit.Assert.fail;
 public class KitTests {
 
     private KitIntegration getKit() {
-        return null;
+        return new SwrveKit();
     }
 
     @Test
