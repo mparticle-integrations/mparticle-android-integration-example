@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -40,19 +41,6 @@ public class KitTests {
         }catch (Exception ex) {
             e = ex;
         }
-        assertNotNull(e);
-    }
-
-    @Test
-    public void testClassName() throws Exception {
-        KitIntegrationFactory factory = new KitIntegrationFactory();
-        Map<Integer, String> integrations = factory.getKnownIntegrations();
-        String className = getKit().getClass().getName();
-        for (Map.Entry<Integer, String> entry : integrations.entrySet()) {
-            if (entry.getValue().equals(className)) {
-                return;
-            }
-        }
-        fail(className + " not found as a known integration.");
+        assertNull(e);
     }
 }
