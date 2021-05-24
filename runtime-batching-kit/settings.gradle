@@ -1,0 +1,3 @@
+include ':batching-kit'
+include ':app'
+rootProject.name = "runtime-batching-kit"
