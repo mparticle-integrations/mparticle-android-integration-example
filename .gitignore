@@ -14,7 +14,7 @@ gen/
 doc/
 
 # Local configuration file (sdk path, etc)
-local.properties
+simple-kit/local.properties
 
 # Eclipse project files
  .classpath
