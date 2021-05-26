@@ -33,6 +33,7 @@ android {
 }
 
 dependencies {
+    implementation files('libs/java-json.jar')
 
     implementation 'com.mparticle:android-kit-base:+'
 

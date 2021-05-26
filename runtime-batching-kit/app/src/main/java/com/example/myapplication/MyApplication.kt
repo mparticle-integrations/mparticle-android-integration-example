@@ -1,7 +1,7 @@
 package com.example.myapplication
 
 import android.app.Application
-import com.example.batching_kit.BatchingKit
+import com.example.kit.BatchingKit
 import com.mparticle.MParticle
 import com.mparticle.MParticleOptions
 import com.mparticle.kits.KitOptions
