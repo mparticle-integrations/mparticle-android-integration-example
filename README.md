@@ -4,6 +4,37 @@ This repository contains a collection of Kit example to aid in the development o
 
 ## Developing Kits
 
+#### Self Managed vs mParticle Managed Kits
+
+Kits can either be "self managed" or "mParticle managed" depending on whether you would prefer that your organization hosts the Kit repository and manages releases or that mParticle hosts the kits in mParticle-integrations and manages release internally. 
+
+The only difference this will make in terms of your kit implementation is:
+
+##### For mParticle Managed Kits *only*
+- you must include the `com.mparticle.kits` plugin in your root-level `build.gradle` file, within the `buildscript` block, like:
+```groovy
+    buildscript {
+    if (!project.hasProperty('version') || project.version.equals('unspecified')) {
+        project.version = '+'
+    }
+
+    repositories {
+        mavenCentral()
+        ...
+    }
+    dependencies {
+        classpath 'com.mparticle:android-kit-plugin:' + project.version
+    }
+}
+```
+
+##### For Self Managed Kits *only*
+- you must include a dependency for the mParticle Kit Base package in your kit's app-level `build.gradle` file, like: 
+```groovy
+    ...
+    api 'com.mparticle:android-kit-base:X.X.X'
+```
+
 ### Working on an existing kit
 
 1) open an Android application
