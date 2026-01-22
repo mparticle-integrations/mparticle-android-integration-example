@@ -23,10 +23,9 @@ import android.content.Context
  * - ./consumer-proguard.pro
  */
 class ExampleKit : KitIntegration() {
-
     public override fun onKitCreate(
         settings: MutableMap<String, String>?,
-        context: Context?
+        context: Context?,
     ): MutableList<ReportingMessage>? {
         /** TODO: Initialize your SDK here
          * This method is analogous to Application#onCreate, and will be called once per app execution.
@@ -40,20 +39,20 @@ class ExampleKit : KitIntegration() {
     }
 
     override fun getName(): String {
-        //TODO: Replace this with your company name
+        // TODO: Replace this with your company name
         return "Example"
     }
 
-
     override fun setOptOut(optedOut: Boolean): MutableList<ReportingMessage>? {
-        //TODO: Disable or enable your SDK when a user opts out.
-        //TODO: If your SDK can not be opted out of, return null
-        val optOutMessage = ReportingMessage(
-            this,
-            ReportingMessage.MessageType.OPT_OUT,
-            System.currentTimeMillis(),
-            null
-        )
+        // TODO: Disable or enable your SDK when a user opts out.
+        // TODO: If your SDK can not be opted out of, return null
+        val optOutMessage =
+            ReportingMessage(
+                this,
+                ReportingMessage.MessageType.OPT_OUT,
+                System.currentTimeMillis(),
+                null,
+            )
         return null
     }
 }
